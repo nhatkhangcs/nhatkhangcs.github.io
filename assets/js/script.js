@@ -7,11 +7,17 @@ hamburger.addEventListener('click', () => {
     navMenu.classList.toggle('active');
 });
 
-// Close mobile menu when clicking on a link
+// Close mobile menu when clicking on internal anchor links only
 document.querySelectorAll('.nav-menu a').forEach(link => {
-    link.addEventListener('click', () => {
-        hamburger.classList.remove('active');
-        navMenu.classList.remove('active');
+    link.addEventListener('click', (e) => {
+        const href = link.getAttribute('href');
+        // Only close menu for internal anchor links (starting with #)
+        if (href && href.startsWith('#')) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        }
+        // For external page links (like blog.html), let the page navigate normally
+        // without closing the menu immediately
     });
 });
 
@@ -307,6 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // 1. Scroll Progress Bar
 function initScrollProgress() {
     const progressBar = document.querySelector('.scroll-progress-bar');
+    if (!progressBar) return; // Exit if progress bar doesn't exist
     
     window.addEventListener('scroll', () => {
         const scrollTop = window.pageYOffset;
@@ -343,6 +350,8 @@ function updateThemeIcon(theme) {
 // 3. Floating Particles Animation
 function initFloatingParticles() {
     const particlesContainer = document.querySelector('.floating-particles');
+    if (!particlesContainer) return; // Exit if container doesn't exist (e.g., on blog page)
+    
     const particleCount = 9;
     
     for (let i = 0; i < particleCount; i++) {

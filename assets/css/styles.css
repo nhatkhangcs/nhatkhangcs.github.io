@@ -1,3 +1,8 @@
+/* Extracted from inline iframe styles */
+.embedded-map {
+    border: 0;
+    border-radius: 12px;
+}
 /* Reset and Base Styles */
 * {
     margin: 0;
@@ -51,6 +56,11 @@ body.dark-mode .nav-menu a:hover {
 body.dark-mode .hamburger span {
     background: #ffffff;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .nav-menu {
+    background-color: #1a1a1a;
+    box-shadow: 0 10px 27px rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode .theme-toggle {
@@ -505,6 +515,70 @@ body.dark-mode .scroll-to-top:hover {
     border-radius: 2px;
 }
 
+/* Latest Section */
+.latest {
+    padding: 80px 0;
+    background: #f8f9fa;
+}
+
+.latest-card {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1.5rem;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.latest-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.latest-icon i {
+    font-size: 1.2rem;
+}
+
+.latest-content h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.latest-content p {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Dark Mode - Latest */
+body.dark-mode .latest {
+    background: #0f0f0f;
+}
+
+body.dark-mode .latest-card {
+    background: #1a1a1a;
+    border-color: #333;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+body.dark-mode .latest-content h3 {
+    color: #e8e8e8;
+}
+
+body.dark-mode .latest-content p {
+    color: #b8b8b8;
+}
+
 /* Navigation */
 .navbar {
     position: fixed;
@@ -701,8 +775,8 @@ body.dark-mode .scroll-to-top:hover {
     background: rgba(102, 126, 234, 0.1);
     border-radius: 12px;
     border: 1px solid rgba(102, 126, 234, 0.2);
-    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     transition: all 0.3s ease;
 }
 
@@ -1529,9 +1603,10 @@ body.dark-mode .scroll-to-top:hover {
         background-color: white;
         width: 100%;
         text-align: center;
-        transition: 0.3s;
+        transition: left 0.3s ease;
         box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
         padding: 2rem 0;
+        z-index: 999;
     }
 
     .nav-menu.active {

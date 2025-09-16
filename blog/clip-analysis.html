@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLIP: Learning Transferable Visual Models From Natural Language Supervision</title>
+    <meta name="description" content="My detailed analysis of CLIP (Radford et al., 2021): objectives, training setup, zero-shot transfer, strengths, limitations, and what I think matters next.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/blog-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- MathJax for LaTeX -->
+    <script>
+      window.MathJax = {
+        tex: {inlineMath: [["$","$"],["\\(","\\)"]], displayMath: [["$$","$$"],["\\[","\\]"]]},
+        options: {skipHtmlTags: ['script','noscript','style','textarea','pre','code']}
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+</head>
+<body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress">
+        <div class="scroll-progress-bar"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="../index.html">Khang Vo</a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../index.html#about">About</a></li>
+                <li><a href="../index.html#research">Research</a></li>
+                <li><a href="../index.html#publications">Publications</a></li>
+                <li><a href="../index.html#projects">Projects</a></li>
+                <li><a href="../index.html#educational">Educational</a></li>
+                <li><a href="../index.html#media">Media</a></li>
+                <li><a href="blog.html" class="active">Blog</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+            <div class="nav-controls">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Blog Post Header -->
+    <section class="blog-post-header">
+        <div class="container">
+            <div class="post-breadcrumb">
+                <a href="blog.html">Blog</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Technical</span>
+            </div>
+
+            <div class="post-header-content">
+                <div class="post-category">Technical</div>
+                <h1 class="post-title">CLIP: Learning Transferable Visual Models From Natural Language Supervision</h1>
+                <p class="post-subtitle">Zero-shot learning, contrastive objectives, and why this paper still matters</p>
+
+                <div class="post-meta">
+                    <div class="post-author">
+                        <img src="../assets/img/images/avatar.jpg" alt="Vo Hoang Nhat Khang" class="author-avatar">
+                        <div class="author-info">
+                            <span class="author-name">Vo Hoang Nhat Khang (Chris)</span>
+                            <span class="author-title">PhD Student in NLP at MBZUAI</span>
+                        </div>
+                    </div>
+                    <div class="post-details">
+                        <span class="post-date">
+                            <i class="fas fa-calendar"></i>
+                            September 15, 2025
+                        </span>
+                        <span class="post-read-time">
+                            <i class="fas fa-clock"></i>
+                            10 min read
+                        </span>
+                    </div>
+                </div>
+
+                <div class="post-tags">
+                    <span class="tag">CLIP</span>
+                    <span class="tag">Contrastive Learning</span>
+                    <span class="tag">Zero-shot</span>
+                    <span class="tag">Multimodal</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Post Content -->
+    <section class="blog-post-content">
+        <div class="container">
+            <div class="post-layout">
+                <article class="post-article">
+                    
+
+                    <div class="post-body">
+                        <h2 id="overview">Overview and Key Idea</h2>
+                        <p>
+                            This post is my take on <a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">CLIP: Learning Transferable Visual Models From Natural Language Supervision</a> (Radford et al., 2021). In my opinion, the core insight is beautifully simple: train an image encoder and a text encoder jointly so that matched image–text pairs are close in a shared embedding space, and everything else is pushed apart. Then, at inference, you can do zero-shot classification by comparing an image embedding to text prompts describing classes. I think this reframing of supervision—from category labels to natural language—was a genuine step change in vision.
+                        </p>
+
+                        <h2 id="objective">Contrastive Objective</h2>
+                        <p>
+                            CLIP uses a symmetric contrastive loss over a batch of size \(N\). Let \(v_i = f_\text{img}(x_i)\) be image embeddings and \(t_i = f_\text{text}(y_i)\) be text embeddings for paired samples \((x_i, y_i)\). After \(\ell_2\)-normalization and a learnable temperature \(\tau\), similarities are \(s_{ij} = \langle v_i, t_j \rangle / \tau\). The loss is the average of two cross-entropies:
+                        </p>
+                        \[
+                            \mathcal{L} = \frac{1}{2}\Bigg( \underbrace{\frac{1}{N} \sum_{i=1}^{N} \! -\log \frac{\exp(s_{ii})}{\sum_{j=1}^{N} \exp(s_{ij})}}_{\text{image} \to \text{text}} \; + \; \underbrace{\frac{1}{N} \sum_{i=1}^{N} \! -\log \frac{\exp(s_{ii})}{\sum_{j=1}^{N} \exp(s_{ji})}}_{\text{text} \to \text{image}} \Bigg).
+                        \]
+                        <p>
+                            I like this formulation because it treats both retrieval directions symmetrically, which stabilizes training and improves generalization.
+                        </p>
+
+                        <h2 id="architecture">Architecture</h2>
+                        <p>
+                            CLIP uses a dual-encoder design: an image encoder (ResNet/ViT) and a text encoder (Transformer) mapped into a shared embedding space, trained with a symmetric contrastive loss. Below is the paper’s high-level diagram (as I read it):
+                        </p>
+                        <figure class="figure-wide">
+                            <img class="figure-img" src="../assets/img/images/blog1-clip/clip-archiecture.png" alt="CLIP architecture diagram">
+                            <figcaption class="figure-caption">
+                                Figure: CLIP dual-encoder architecture (image and text encoders into a shared embedding space with contrastive training). Source: my annotated snapshot of the paper.
+                            </figcaption>
+                        </figure>
+
+                        <h2 id="training">Data and Training Setup</h2>
+                        <p>
+                            In my view, two ingredients make CLIP work: scale and diversity. The paper reports pretraining on ~400M image–text pairs scraped from the web. Vision backbones include ResNet variants and Vision Transformers; the text encoder is a Transformer. Everything is trained end-to-end with the contrastive objective and prompt engineering is used at evaluation to phrase labels as sentences.
+                        </p>
+
+                        <h2 id="zero-shot">Zero-shot Inference</h2>
+                        <p>
+                            For zero-shot classification over classes \(\{c_k\}\), I build prompts like “a photo of a \(c_k\)” (the paper averages over multiple templates). Compute text embeddings \(t_k\) and compare to the image embedding \(v\) via cosine similarity. The predicted class is:
+                        </p>
+                        \[
+                            \hat{k} = \arg\max_k \; \frac{\langle v, t_k \rangle}{\lVert v \rVert \, \lVert t_k \rVert}.
+                        \]
+                        <p>
+                            I think the prompt engineering aspect foreshadows instruction tuning: language is the interface to visual concepts.
+                        </p>
+
+                        <h2 id="results">Results I Find Most Convincing</h2>
+                        <ul>
+                            <li><strong>Broad transfer:</strong> Zero-shot performance competitive with supervised baselines on many datasets, without fine-tuning.</li>
+                            <li><strong>Compositionality:</strong> Natural language enables describing open-ended concepts beyond fixed label sets.</li>
+                            <li><strong>Retrieval:</strong> Symmetric retrieval (image→text, text→image) emerges naturally from the objective.</li>
+                        </ul>
+
+                        <h2 id="results-tables">Results from the Paper (Tables)</h2>
+                        <p>
+                            Below I summarize the key results reported in the paper, grouped by evaluation setting. For full numbers and per-dataset breakdowns, see the original paper: <a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">arXiv:2103.00020</a>.
+                        </p>
+
+                        <h3>Zero-shot Image Classification</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Backbone</th>
+                                    <th>Setting</th>
+                                    <th>Dataset(s)</th>
+                                    <th>Outcome Summary</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ResNet / ViT variants</td>
+                                    <td>Zero-shot</td>
+                                    <td>ImageNet (and variants)</td>
+                                    <td>Competitive with a supervised ResNet-50 without using ImageNet labels; strong transfer via prompts.</td>
+                                </tr>
+                                <tr>
+                                    <td>ResNet / ViT variants</td>
+                                    <td>Zero-shot</td>
+                                    <td>30+ datasets (e.g., CIFAR-100, OxfordPets, Flowers, Food, SUN397, Caltech101)</td>
+                                    <td>Consistent zero-shot gains vs. chance and competitive with supervised baselines; benefits from prompt ensembles.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Linear Probe Transfer</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Representation</th>
+                                    <th>Probe</th>
+                                    <th>Dataset(s)</th>
+                                    <th>Outcome Summary</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>CLIP image encoder</td>
+                                    <td>Linear classifier</td>
+                                    <td>ImageNet and standard transfer suites</td>
+                                    <td>Strong linear separability; linear probe narrows the gap to supervised training on many datasets.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Image–Text Retrieval</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Task</th>
+                                    <th>Metric</th>
+                                    <th>Dataset(s)</th>
+                                    <th>Outcome Summary</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Image→Text, Text→Image</td>
+                                    <td>Recall@K</td>
+                                    <td>Common benchmarks (e.g., Flickr/Coco)</td>
+                                    <td>Competitive retrieval without task-specific training due to shared embedding space and symmetric loss.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Robustness and Distribution Shift</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Evaluation</th>
+                                    <th>Dataset(s)</th>
+                                    <th>Outcome Summary</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Zero-shot under distribution shift</td>
+                                    <td>ImageNetV2, ImageNet-R, ImageNet-Sketch, etc.</td>
+                                    <td>Improved robustness compared to supervised ImageNet models; language priors aid generalization.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p class="note-muted">
+                            Note: This section is a structured summary of the paper's reported results. For exact numeric scores, please refer to the tables and figures in the paper <a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">[link]</a>.
+                        </p>
+
+                        <h2 id="limitations">Limitations and What I’d Watch Out For</h2>
+                        <ul>
+                            <li><strong>Bias and spurious cues:</strong> Web data is messy; in my opinion, CLIP embeddings reflect societal biases and artifacts.</li>
+                            <li><strong>Localization:</strong> The global embedding is not a substitute for fine-grained spatial grounding.</li>
+                            <li><strong>Domain shift:</strong> Medical or scientific imagery often requires adaptation or careful prompting.</li>
+                        </ul>
+
+                        <h2 id="math-notes">Optimization Notes</h2>
+                        <p>
+                            Temperature \(\tau\) controls the softness of the distribution. Lower \(\tau\) sharpens similarities, effectively increasing gradients for hard negatives. I think tuning \(\tau\) is crucial when batch composition changes.
+                        </p>
+                        \[
+                            p_{ij}^{(I\to T)} = \frac{\exp(\langle v_i, t_j \rangle / \tau)}{\sum_{k} \exp(\langle v_i, t_k \rangle / \tau)}\,, \quad
+                            p_{ij}^{(T\to I)} = \frac{\exp(\langle t_i, v_j \rangle / \tau)}{\sum_{k} \exp(\langle t_i, v_k \rangle / \tau)}.
+                        \]
+
+                        <h2 id="practice">Practical Tips I Use</h2>
+                        <ul>
+                            <li>Average over multiple prompt templates; it reduces variance.</li>
+                            <li>Normalize embeddings and monitor \(\tau\); instability often shows up as exploding similarities.</li>
+                            <li>For niche domains, I prefer <em>class-specific prompts</em> with domain vocabulary.</li>
+                        </ul>
+
+                        <h2 id="beyond-clip">Beyond CLIP</h2>
+                        <p>
+                            In my opinion, CLIP set the stage for instruction-following vision-language models (e.g., CLIP→ALIGN→BLIP→GPT-4V). The general recipe—contrastive pretraining + language interfaces—still underpins many modern systems.
+                        </p>
+
+                        <h2 id="citation">Citation</h2>
+                        <p>
+                            Radford, A., Kim, J. W., Hallacy, C., et al. “Learning Transferable Visual Models From Natural Language Supervision.” arXiv, 2021. Available at <a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">https://arxiv.org/abs/2103.00020</a>.
+                        </p>
+                    </div>
+
+                    <div class="post-footer">
+                        <div class="post-share">
+                            <span class="share-label">Share this article:</span>
+                            <div class="share-buttons">
+                                <button class="share-btn twitter" onclick="sharePost('twitter')" aria-label="Share on Twitter" title="Share on Twitter">
+                                    <i class="fab fa-twitter"></i>
+                                </button>
+                                <button class="share-btn linkedin" onclick="sharePost('linkedin')" aria-label="Share on LinkedIn" title="Share on LinkedIn">
+                                    <i class="fab fa-linkedin"></i>
+                                </button>
+                                <button class="share-btn facebook" onclick="sharePost('facebook')" aria-label="Share on Facebook" title="Share on Facebook">
+                                    <i class="fab fa-facebook"></i>
+                                </button>
+                                <button class="share-btn copy" onclick="copyLink()" aria-label="Copy link" title="Copy link">
+                                    <i class="fas fa-link"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Sidebar -->
+                <aside class="post-sidebar">
+                    <div class="sidebar-widget toc-widget">
+                        <h3 class="widget-title">Table of Contents</h3>
+                        <nav class="toc-nav">
+                            <ul>
+                                <li><a href="#overview">Overview and Key Idea</a></li>
+                                <li><a href="#objective">Contrastive Objective</a></li>
+                                <li><a href="#training">Data and Training Setup</a></li>
+                                <li><a href="#zero-shot">Zero-shot Inference</a></li>
+                                <li><a href="#results">Results</a></li>
+                                <li><a href="#limitations">Limitations</a></li>
+                                <li><a href="#math-notes">Optimization Notes</a></li>
+                                <li><a href="#practice">Practical Tips</a></li>
+                                <li><a href="#beyond-clip">Beyond CLIP</a></li>
+                                <li><a href="#citation">Citation</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Vo Hoang Nhat Khang (Chris). All rights reserved.</p>
+                <div class="visitor-counter">
+                    <i class="fas fa-eye"></i>
+                    <span>Total Visitors: <span id="visitor-count">Loading...</span></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/blog-script.js"></script>
+</body>
+</html>
+
+

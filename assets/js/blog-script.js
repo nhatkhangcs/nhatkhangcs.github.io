@@ -562,7 +562,11 @@ class BlogShare {
 
         const titleElement = post.querySelector('.post-title a, h2.post-title a, h3.post-title a');
         const title = titleElement ? titleElement.textContent : 'Blog Post';
-        const url = window.location.href;
+        // Prefer the specific post link on listing pages; fallback to current URL
+        const linkElement = post.querySelector('.post-title a, .post-image a');
+        const url = linkElement && linkElement.getAttribute('href')
+            ? new URL(linkElement.getAttribute('href'), window.location.href).href
+            : window.location.href;
 
         const platforms = [
             { name: 'Twitter', icon: 'fab fa-twitter', color: '#1da1f2' },

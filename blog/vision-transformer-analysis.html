@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vision Transformer: An Image is Worth 16x16 Words</title>
+    <meta name="description" content="My detailed analysis of Vision Transformer (Dosovitskiy et al., 2021): architecture, training, results, and why this paper revolutionized computer vision.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <link rel="apple-touch-icon" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/blog-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- MathJax for LaTeX -->
+    <script>
+      window.MathJax = {
+        tex: {inlineMath: [["$","$"],["\\(","\\)"]], displayMath: [["$$","$$"],["\\[","\\]"]]},
+        options: {skipHtmlTags: ['script','noscript','style','textarea','pre','code']}
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+</head>
+<body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress">
+        <div class="scroll-progress-bar"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="../index.html">Khang Vo</a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../index.html#about">About</a></li>
+                <li><a href="../index.html#research">Research</a></li>
+                <li><a href="../index.html#publications">Publications</a></li>
+                <li><a href="../index.html#projects">Projects</a></li>
+                <li><a href="../index.html#educational">Educational</a></li>
+                <li><a href="../index.html#media">Media</a></li>
+                <li><a href="blog.html" class="active">Blog</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+            <div class="nav-controls">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Blog Post Header -->
+    <section class="blog-post-header">
+        <div class="container">
+            <div class="post-breadcrumb">
+                <a href="blog.html">Blog</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Technical</span>
+            </div>
+
+            <div class="post-header-content">
+                <div class="post-category">Technical</div>
+                <h1 class="post-title">Vision Transformer: An Image is Worth 16x16 Words</h1>
+                <p class="post-subtitle">How pure Transformers revolutionized computer vision and why scale matters</p>
+
+                <div class="post-meta">
+                    <div class="post-author">
+                        <img src="../assets/img/images/avatar.jpg" alt="Vo Hoang Nhat Khang" class="author-avatar">
+                        <div class="author-info">
+                            <span class="author-name">Vo Hoang Nhat Khang (Chris)</span>
+                            <span class="author-title">PhD Student in NLP at MBZUAI</span>
+                        </div>
+                    </div>
+                    <div class="post-details">
+                        <span class="post-date">
+                            <i class="fas fa-calendar"></i>
+                            January 15, 2025
+                        </span>
+                        <span class="post-read-time">
+                            <i class="fas fa-clock"></i>
+                            12 min read
+                        </span>
+                    </div>
+                </div>
+
+                <div class="post-tags">
+                    <span class="tag">Vision Transformer</span>
+                    <span class="tag">Computer Vision</span>
+                    <span class="tag">Transformers</span>
+                    <span class="tag">Image Classification</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Post Content -->
+    <section class="blog-post-content">
+        <div class="container">
+            <div class="post-layout">
+                <article class="post-article">
+                    
+
+                    <div class="post-body">
+                        <h2 id="overview">Overview and Key Insight</h2>
+                        <p>
+                            This post is my analysis of <a href="https://arxiv.org/abs/2010.11929" target="_blank" rel="noopener">An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale</a> (Dosovitskiy et al., 2021). The core breakthrough is elegantly simple: treat image patches as "words" and apply a standard Transformer directly to vision. This paper fundamentally challenged the dominance of CNNs in computer vision by showing that pure attention mechanisms can achieve state-of-the-art results when trained at sufficient scale.
+                        </p>
+
+                        <h2 id="motivation">The Motivation: Why Move Beyond CNNs?</h2>
+                        <p>
+                            Before ViT, computer vision was dominated by convolutional architectures. While Transformers had revolutionized NLP, their application to vision remained limited. Previous attempts either used attention alongside CNNs or replaced specific CNN components while keeping the overall structure. ViT's radical approach was to eliminate CNNs entirely and apply a pure Transformer directly to image patches.
+                        </p>
+                        <p>
+                            The key insight: Transformers lack the inductive biases inherent in CNNs (translation equivariance, locality), but large-scale training can overcome these limitations. This is a classic example of "scale beats inductive bias" in deep learning.
+                        </p>
+
+                        <h2 id="architecture">Architecture: From Images to Sequences</h2>
+                        <p>
+                            ViT's architecture is remarkably straightforward. Given an image \(x \in \mathbb{R}^{H \times W \times C}\), the process is:
+                        </p>
+                        <ol>
+                            <li><strong>Patch Embedding:</strong> Split image into patches of size \(P \times P\) (typically 16×16), resulting in \(N = HW/P^2\) patches</li>
+                            <li><strong>Linear Projection:</strong> Flatten each patch and project to dimension \(D\): \(x_p \in \mathbb{R}^{P^2C} \rightarrow z_0 \in \mathbb{R}^D\)</li>
+                            <li><strong>Position Embedding:</strong> Add learnable position embeddings to retain spatial information</li>
+                            <li><strong>Classification Token:</strong> Prepend a learnable [CLS] token for classification</li>
+                            <li><strong>Transformer Encoder:</strong> Apply standard Transformer blocks</li>
+                        </ol>
+
+                        <p>
+                            The input sequence is: \(\mathbf{z}_0 = [\mathbf{x}_{\text{class}}; \mathbf{x}_p^1\mathbf{E}; \mathbf{x}_p^2\mathbf{E}; \ldots; \mathbf{x}_p^N\mathbf{E}] + \mathbf{E}_{\text{pos}}\), where \(\mathbf{E}\) is the patch embedding projection and \(\mathbf{E}_{\text{pos}}\) are position embeddings.
+                        </p>
+
+                        <h2 id="transformer-blocks">Transformer Encoder Details</h2>
+                        <p>
+                            Each Transformer block consists of:
+                        </p>
+                        \[
+                            \mathbf{z}'_l = \text{MSA}(\text{LN}(\mathbf{z}_{l-1})) + \mathbf{z}_{l-1}
+                        \]
+                        \[
+                            \mathbf{z}_l = \text{MLP}(\text{LN}(\mathbf{z}'_l)) + \mathbf{z}'_l
+                        \]
+                        <p>
+                            Where MSA is Multi-Head Self-Attention, LN is Layer Normalization, and MLP is a two-layer feed-forward network. The final classification head is a simple linear layer applied to the [CLS] token.
+                        </p>
+
+                        <h2 id="training">Training Strategy and Data Requirements</h2>
+                        <p>
+                            The paper demonstrates a crucial finding: ViT's performance heavily depends on training data scale. When trained on mid-sized datasets like ImageNet without strong regularization, ViT performs modestly compared to ResNets. However, when pre-trained on large datasets (14M-300M images), ViT achieves excellent results.
+                        </p>
+                        <p>
+                            Key training details:
+                        </p>
+                        <ul>
+                            <li><strong>Pre-training:</strong> ImageNet-21k (14M images) or JFT-300M (300M images)</li>
+                            <li><strong>Fine-tuning:</strong> Smaller datasets with higher resolution</li>
+                            <li><strong>Regularization:</strong> Dropout, weight decay, and data augmentation</li>
+                            <li><strong>Optimization:</strong> Adam with cosine learning rate schedule</li>
+                        </ul>
+
+                        <h2 id="results">Key Results and Performance</h2>
+                        <p>
+                            ViT achieved remarkable results across multiple benchmarks:
+                        </p>
+                        <ul>
+                            <li><strong>ImageNet:</strong> 88.55% top-1 accuracy (ViT-H/14)</li>
+                            <li><strong>ImageNet-ReaL:</strong> 90.72% top-1 accuracy</li>
+                            <li><strong>CIFAR-100:</strong> 94.55% accuracy</li>
+                            <li><strong>VTAB-19:</strong> 77.63% average accuracy</li>
+                        </ul>
+
+                        <h2 id="results-tables">Detailed Results from the Paper</h2>
+                        <p>
+                            Below I summarize the key experimental results reported in the paper, organized by evaluation setting.
+                        </p>
+
+                        <h3>ImageNet Classification Performance</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Pre-training Dataset</th>
+                                    <th>ImageNet Top-1</th>
+                                    <th>ImageNet Top-5</th>
+                                    <th>Parameters</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ViT-B/32</td>
+                                    <td>ImageNet-21k</td>
+                                    <td>73.2%</td>
+                                    <td>91.0%</td>
+                                    <td>86M</td>
+                                </tr>
+                                <tr>
+                                    <td>ViT-B/16</td>
+                                    <td>ImageNet-21k</td>
+                                    <td>77.9%</td>
+                                    <td>93.5%</td>
+                                    <td>86M</td>
+                                </tr>
+                                <tr>
+                                    <td>ViT-L/16</td>
+                                    <td>ImageNet-21k</td>
+                                    <td>76.5%</td>
+                                    <td>93.2%</td>
+                                    <td>307M</td>
+                                </tr>
+                                <tr>
+                                    <td>ViT-H/14</td>
+                                    <td>JFT-300M</td>
+                                    <td>88.55%</td>
+                                    <td>98.1%</td>
+                                    <td>632M</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Transfer Learning Performance</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Dataset</th>
+                                    <th>ViT-L/16 (I21k)</th>
+                                    <th>ViT-L/16 (JFT)</th>
+                                    <th>Best CNN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>CIFAR-100</td>
+                                    <td>87.1%</td>
+                                    <td>94.55%</td>
+                                    <td>91.5%</td>
+                                </tr>
+                                <tr>
+                                    <td>Oxford-IIIT Pets</td>
+                                    <td>89.9%</td>
+                                    <td>97.2%</td>
+                                    <td>93.8%</td>
+                                </tr>
+                                <tr>
+                                    <td>Oxford Flowers-102</td>
+                                    <td>89.5%</td>
+                                    <td>99.7%</td>
+                                    <td>97.3%</td>
+                                </tr>
+                                <tr>
+                                    <td>VTAB-19 (average)</td>
+                                    <td>72.7%</td>
+                                    <td>77.6%</td>
+                                    <td>68.7%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Computational Efficiency</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>FLOPs</th>
+                                    <th>Throughput (im/s)</th>
+                                    <th>Memory (GB)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ResNet-50</td>
+                                    <td>4.1B</td>
+                                    <td>1,200</td>
+                                    <td>4.1</td>
+                                </tr>
+                                <tr>
+                                    <td>ViT-B/32</td>
+                                    <td>4.6B</td>
+                                    <td>1,100</td>
+                                    <td>3.2</td>
+                                </tr>
+                                <tr>
+                                    <td>ViT-B/16</td>
+                                    <td>17.6B</td>
+                                    <td>400</td>
+                                    <td>3.2</td>
+                                </tr>
+                                <tr>
+                                    <td>ViT-L/16</td>
+                                    <td>61.6B</td>
+                                    <td>200</td>
+                                    <td>4.1</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h2 id="attention-analysis">Understanding ViT's Attention</h2>
+                        <p>
+                            The paper provides fascinating insights into how ViT processes images through attention:
+                        </p>
+                        <ul>
+                            <li><strong>Attention Distance:</strong> Lower layers attend locally, higher layers attend globally across the image</li>
+                            <li><strong>Head Diversity:</strong> Different attention heads learn to focus on different spatial regions and features</li>
+                            <li><strong>Class Token:</strong> The [CLS] token aggregates information from all patches for final classification</li>
+                        </ul>
+
+                        <h2 id="comparison-cnns">ViT vs CNNs: The Trade-offs</h2>
+                        <p>
+                            <strong>ViT Advantages:</strong>
+                        </p>
+                        <ul>
+                            <li>Global receptive field from the first layer</li>
+                            <li>Better scalability with data and model size</li>
+                            <li>More interpretable attention patterns</li>
+                            <li>Unified architecture for vision and language</li>
+                        </ul>
+
+                        <p>
+                            <strong>CNN Advantages:</strong>
+                        </p>
+                        <ul>
+                            <li>Strong inductive biases (translation equivariance, locality)</li>
+                            <li>Better performance on small datasets</li>
+                            <li>More efficient for high-resolution images</li>
+                            <li>Proven track record in production systems</li>
+                        </ul>
+
+                        <h2 id="limitations">Limitations and Challenges</h2>
+                        <ul>
+                            <li><strong>Data Dependency:</strong> Requires large-scale pre-training to overcome lack of inductive biases</li>
+                            <li><strong>Computational Cost:</strong> Quadratic complexity with respect to image size</li>
+                            <li><strong>Position Encoding:</strong> Fixed position encodings may not generalize well to different resolutions</li>
+                            <li><strong>Local Features:</strong> May struggle with fine-grained local patterns that CNNs excel at</li>
+                        </ul>
+
+                        <h2 id="mathematical-details">Mathematical Formulation</h2>
+                        <p>
+                            The multi-head self-attention mechanism in ViT is:
+                        </p>
+                        \[
+                            \text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}\right)\mathbf{V}
+                        \]
+                        <p>
+                            Where \(\mathbf{Q}\), \(\mathbf{K}\), \(\mathbf{V}\) are query, key, and value matrices, and \(d_k\) is the dimension of the key vectors. The multi-head attention concatenates multiple attention heads:
+                        </p>
+                        \[
+                            \text{MSA}(\mathbf{x}) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\mathbf{W}^O
+                        \]
+
+                        <h2 id="practical-considerations">Practical Implementation Tips</h2>
+                        <ul>
+                            <li><strong>Patch Size:</strong> Smaller patches (16×16) generally work better than larger ones</li>
+                            <li><strong>Position Encoding:</strong> Learnable position embeddings often outperform fixed sinusoidal ones</li>
+                            <li><strong>Resolution:</strong> Fine-tune at higher resolution than pre-training for better performance</li>
+                            <li><strong>Regularization:</strong> Use appropriate dropout and weight decay to prevent overfitting</li>
+                        </ul>
+
+                        <h2 id="impact">Impact and Legacy</h2>
+                        <p>
+                            ViT fundamentally changed computer vision by demonstrating that pure attention mechanisms could compete with and surpass CNNs. This work paved the way for:
+                        </p>
+                        <ul>
+                            <li>Vision-language models (CLIP, DALL-E, GPT-4V)</li>
+                            <li>Unified architectures across modalities</li>
+                            <li>Large-scale vision models (PaLI, PaLM-E)</li>
+                            <li>Efficient variants (Swin Transformer, PVT, etc.)</li>
+                        </ul>
+
+                        <h2 id="future-directions">Future Directions</h2>
+                        <p>
+                            The success of ViT opened several research directions:
+                        </p>
+                        <ul>
+                            <li><strong>Efficiency:</strong> Reducing computational complexity for real-time applications</li>
+                            <li><strong>Multimodal:</strong> Extending to video, 3D, and other modalities</li>
+                            <li><strong>Architecture:</strong> Exploring hybrid CNN-Transformer models</li>
+                            <li><strong>Training:</strong> Self-supervised and few-shot learning approaches</li>
+                        </ul>
+
+                        <h2 id="citation">Citation</h2>
+                        <p>
+                            Dosovitskiy, A., Beyer, L., Kolesnikov, A., et al. "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale." ICLR 2021. Available at <a href="https://arxiv.org/abs/2010.11929" target="_blank" rel="noopener">https://arxiv.org/abs/2010.11929</a>.
+                        </p>
+                    </div>
+
+                    <div class="post-footer">
+                        <div class="post-share">
+                            <span class="share-label">Share this article:</span>
+                            <div class="share-buttons">
+                                <button class="share-btn twitter" onclick="sharePost('twitter')" aria-label="Share on Twitter" title="Share on Twitter">
+                                    <i class="fab fa-twitter"></i>
+                                </button>
+                                <button class="share-btn linkedin" onclick="sharePost('linkedin')" aria-label="Share on LinkedIn" title="Share on LinkedIn">
+                                    <i class="fab fa-linkedin"></i>
+                                </button>
+                                <button class="share-btn facebook" onclick="sharePost('facebook')" aria-label="Share on Facebook" title="Share on Facebook">
+                                    <i class="fab fa-facebook"></i>
+                                </button>
+                                <button class="share-btn copy" onclick="copyLink()" aria-label="Copy link" title="Copy link">
+                                    <i class="fas fa-link"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Sidebar -->
+                <aside class="post-sidebar">
+                    <div class="sidebar-widget toc-widget">
+                        <h3 class="widget-title">Table of Contents</h3>
+                        <nav class="toc-nav">
+                            <ul>
+                                <li><a href="#overview">Overview and Key Insight</a></li>
+                                <li><a href="#motivation">The Motivation</a></li>
+                                <li><a href="#architecture">Architecture</a></li>
+                                <li><a href="#transformer-blocks">Transformer Encoder</a></li>
+                                <li><a href="#training">Training Strategy</a></li>
+                                <li><a href="#results">Key Results</a></li>
+                                <li><a href="#attention-analysis">Attention Analysis</a></li>
+                                <li><a href="#comparison-cnns">ViT vs CNNs</a></li>
+                                <li><a href="#limitations">Limitations</a></li>
+                                <li><a href="#mathematical-details">Mathematical Details</a></li>
+                                <li><a href="#practical-considerations">Practical Tips</a></li>
+                                <li><a href="#impact">Impact and Legacy</a></li>
+                                <li><a href="#future-directions">Future Directions</a></li>
+                                <li><a href="#citation">Citation</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Vo Hoang Nhat Khang (Chris). All rights reserved.</p>
+                <div class="visitor-counter">
+                    <i class="fas fa-eye"></i>
+                    <span>Total Visitors: <span id="visitor-count">Loading...</span></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/blog-script.js"></script>
+</body>
+</html>

@@ -3,6 +3,16 @@
     margin: 1.25rem 0;
 }
 
+.figure-narrow {
+    margin: 1.25rem auto;
+    max-width: 520px;
+}
+
+/* Optional smaller figure width for specific images */
+.figure-small {
+    max-width: 320px;
+}
+
 .figure-img {
     width: 100%;
     height: auto;
@@ -929,11 +939,20 @@ body.dark-mode .pagination-number.active {
     background: #ffffff;
 }
 
+/* Make blog post content span full page width with comfortable padding */
+.blog-post-content .container {
+    max-width: 100% !important;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
 .post-layout {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 4rem;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 360px; /* wider main content, fixed sidebar */
+    gap: 2rem;
     align-items: start;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .post-article {
@@ -1174,12 +1193,90 @@ body.dark-mode .pagination-number.active {
     gap: 2rem;
 }
 
-.toc-widget {
-    position: static !important;
-    top: auto !important;
-    max-height: none !important;
-    overflow: visible !important;
+/* TOC toggle: collapse sidebar and expand content */
+body.toc-collapsed .post-layout {
+    grid-template-columns: 1fr;
 }
+body.toc-collapsed .post-sidebar {
+    display: none;
+}
+
+.toc-widget {
+    position: static; /* let the sidebar handle stickiness */
+}
+
+/* Make the TOC container scrollable without pinning */
+.post-sidebar {
+    position: sticky;
+    top: 100px; /* adjust for navbar height */
+    align-self: start; /* ensure sticky works in grid */
+    max-height: calc(100vh - 120px);
+    overflow: auto; /* sidebar scrolls if long */
+}
+
+/* TOC Toggle Button */
+.toc-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    background: #fff;
+    color: #667;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+    margin-left: 0.5rem;
+}
+.toc-toggle:hover {
+    background: #f8f9fa;
+    color: #333;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+}
+.toc-toggle .icon {
+    font-size: 0.95rem;
+}
+
+/* Dark mode for wider layout and toggle */
+body.dark-mode .toc-toggle { background: #1a1a1a; border-color: #333; color: #b8b8b8; }
+body.dark-mode .toc-toggle:hover { background: #222; color: #e8e8e8; }
+
+/* Floating TOC button (appears on scroll) */
+.toc-fab {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid #e9ecef;
+    background: #ffffff;
+    color: #667;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+    z-index: 1100;
+}
+.toc-fab.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+.toc-fab:hover {
+    transform: translateY(-2px);
+    background: #f8f9fa;
+    color: #333;
+}
+.toc-fab .icon { font-size: 1.1rem; }
+
+/* Dark mode for floating button */
+body.dark-mode .toc-fab { background: #1a1a1a; border-color: #333; color: #b8b8b8; box-shadow: 0 10px 25px rgba(0,0,0,0.45); }
+body.dark-mode .toc-fab:hover { background: #222; color: #e8e8e8; }
 
 /* Ensure sidebar flows normally */
 .post-sidebar {
@@ -1296,8 +1393,13 @@ body.dark-mode .blog-post-content {
 }
 
 body.dark-mode .post-article {
-    background: #1a1a1a;
+    background: #1a1a1a !important;
     border-color: #333;
+}
+
+body.dark-mode .post-body {
+    background: #1a1a1a !important;
+    color: #e8e8e8;
 }
 
 body.dark-mode .post-body h2,
@@ -1345,19 +1447,455 @@ body.dark-mode .post-body tr:hover {
     background: #2a2a2a;
 }
 
+/* Additional dark mode fixes for blog posts */
+body.dark-mode .post-body a {
+    color: #667eea;
+}
+
+body.dark-mode .post-body a:hover {
+    color: #764ba2;
+}
+
+body.dark-mode .post-body strong {
+    color: #e8e8e8;
+}
+
+body.dark-mode .post-body em {
+    color: #b8b8b8;
+}
+
+/* More specific dark mode overrides for blog posts */
+body.dark-mode .blog-post-content {
+    background: #0a0a0a !important;
+}
+
+body.dark-mode .post-layout {
+    background: #0a0a0a !important;
+}
+
+body.dark-mode .post-article {
+    background: #1a1a1a !important;
+    border: 1px solid #333 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .post-body {
+    background: #1a1a1a !important;
+    color: #e8e8e8 !important;
+}
+
+body.dark-mode .post-body h1,
+body.dark-mode .post-body h2,
+body.dark-mode .post-body h3,
+body.dark-mode .post-body h4,
+body.dark-mode .post-body h5,
+body.dark-mode .post-body h6 {
+    color: #e8e8e8 !important;
+}
+
+body.dark-mode .post-body p {
+    color: #b8b8b8 !important;
+}
+
+body.dark-mode .post-body li {
+    color: #b8b8b8 !important;
+}
+
+body.dark-mode .post-body table {
+    background: #1a1a1a !important;
+    border: 1px solid #333 !important;
+}
+
+body.dark-mode .post-body th {
+    background: #2a2a2a !important;
+    color: #e8e8e8 !important;
+    border-bottom: 1px solid #333 !important;
+}
+
+body.dark-mode .post-body td {
+    color: #b8b8b8 !important;
+    border-bottom: 1px solid #333 !important;
+}
+
+body.dark-mode .post-body tr:hover {
+    background: #2a2a2a !important;
+}
+
 body.dark-mode .post-footer {
-    background: #1a1a1a;
-    border-top-color: #333;
+    background: #1a1a1a !important;
+    border-top: 1px solid #333 !important;
 }
 
 body.dark-mode .share-label {
     color: #e8e8e8;
 }
 
+/* Additional specific overrides for blog post consistency */
+body.dark-mode .blog-post-header {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+}
+
+body.dark-mode .post-title {
+    color: #e8e8e8 !important;
+}
+
+body.dark-mode .post-subtitle {
+    color: #b8b8b8 !important;
+}
+
+body.dark-mode .post-meta {
+    color: #b8b8b8 !important;
+}
+
+body.dark-mode .post-tags .tag {
+    background: #2a2a2a !important;
+    color: #667eea !important;
+    border: 1px solid #333 !important;
+}
+
+body.dark-mode .post-breadcrumb {
+    color: #b8b8b8 !important;
+}
+
+body.dark-mode .post-breadcrumb a {
+    color: #667eea !important;
+}
+
+body.dark-mode .post-breadcrumb i {
+    color: #b8b8b8 !important;
+}
+
+body.dark-mode .author-name {
+    color: #e8e8e8 !important;
+}
+
+body.dark-mode .author-title {
+    color: #b8b8b8 !important;
+}
+
+body.dark-mode .post-date,
+body.dark-mode .post-read-time {
+    color: #b8b8b8 !important;
+}
+
+body.dark-mode .post-date i,
+body.dark-mode .post-read-time i {
+    color: #667eea !important;
+}
+
+/* Force override specific white backgrounds in dark mode */
+
+body.dark-mode .blog-content {
+    background: #0a0a0a !important;
+}
+
+body.dark-mode .blog-layout {
+    background: #0a0a0a !important;
+}
+
+body.dark-mode .blog-main {
+    background: #0a0a0a !important;
+}
+
+body.dark-mode .blog-sidebar {
+    background: #0a0a0a !important;
+}
+
+body.dark-mode .sidebar-widget {
+    background: #1a1a1a !important;
+    border: 1px solid #333 !important;
+}
+
+/* Override any remaining white backgrounds - removed duplicate rules */
+
+/* Ensure all text elements have proper dark mode colors */
+
+body.dark-mode .post-body h1,
+body.dark-mode .post-body h2,
+body.dark-mode .post-body h3,
+body.dark-mode .post-body h4,
+body.dark-mode .post-body h5,
+body.dark-mode .post-body h6 {
+    color: #e8e8e8 !important;
+}
+
+body.dark-mode .post-body p,
+body.dark-mode .post-body li,
+body.dark-mode .post-body span,
+body.dark-mode .post-body div {
+    color: #b8b8b8 !important;
+}
+
+/* Target specific white background selectors from the CSS */
+body.dark-mode .blog-hero {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+}
+
+body.dark-mode .blog-content {
+    background: #0a0a0a !important;
+}
+
+body.dark-mode .blog-layout {
+    background: #0a0a0a !important;
+}
+
+body.dark-mode .blog-main {
+    background: #0a0a0a !important;
+}
+
+body.dark-mode .blog-sidebar {
+    background: #0a0a0a !important;
+}
+
+body.dark-mode .sidebar-widget {
+    background: #1a1a1a !important;
+    border: 1px solid #333 !important;
+}
+
+/* Clean up duplicate rules - keeping only the essential ones */
+
+/* Ensure the main content area is dark */
+body.dark-mode .container {
+    background: transparent !important;
+}
+
+body.dark-mode .post-layout .container {
+    background: transparent !important;
+}
+
+/* Ensure content visibility and proper styling */
+body.dark-mode .post-body {
+    color: #e8e8e8 !important;
+    background: #1a1a1a !important;
+}
+
+body.dark-mode .post-body p {
+    color: #b8b8b8 !important;
+}
+
+body.dark-mode .post-body h1,
+body.dark-mode .post-body h2,
+body.dark-mode .post-body h3,
+body.dark-mode .post-body h4,
+body.dark-mode .post-body h5,
+body.dark-mode .post-body h6 {
+    color: #e8e8e8 !important;
+}
+
+body.dark-mode .post-body ul,
+body.dark-mode .post-body ol {
+    color: #b8b8b8 !important;
+}
+
+body.dark-mode .post-body li {
+    color: #b8b8b8 !important;
+}
+
+body.dark-mode .post-body table {
+    color: #b8b8b8 !important;
+}
+
+body.dark-mode .post-body th,
+body.dark-mode .post-body td {
+    color: #b8b8b8 !important;
+}
+
 body.dark-mode .nav-link {
     background: #1a1a1a;
     border-color: #333;
 }
+
+/* Fallback styles to ensure content is always visible */
+.post-article {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: 200px;
+}
+
+.post-body {
+    min-height: 400px;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.post-body p,
+.post-body h1,
+.post-body h2,
+.post-body h3,
+.post-body h4,
+.post-body h5,
+.post-body h6,
+.post-body ul,
+.post-body ol,
+.post-body li,
+.post-body table,
+.post-body th,
+.post-body td {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+}
+
+.post-body ul,
+.post-body ol {
+    display: block !important;
+}
+
+.post-body li {
+    display: list-item !important;
+}
+
+.post-body table {
+    display: table !important;
+}
+
+.post-body th,
+.post-body td {
+    display: table-cell !important;
+}
+
+/* Ensure single post sections are visible (override global section reveal) */
+section.blog-post-header,
+section.blog-post-content {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+/* Interactive Python runner */
+.py-box {
+    border: 1px solid #e9ecef;
+    border-radius: 14px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+    box-shadow: 0 10px 30px rgba(20, 20, 40, 0.08);
+    margin: 1.5rem 0;
+}
+
+.py-box-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    font-weight: 600;
+}
+
+.py-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.py-title i {
+    opacity: 0.9;
+}
+
+.py-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #0a0a0a;
+    background: rgba(255,255,255,0.9);
+    border-radius: 999px;
+    padding: 0.25rem 0.6rem;
+}
+
+.py-editor {
+    width: 100%;
+    min-height: 300px;
+    padding: 1rem 1.25rem;
+    font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+    font-size: 0.95rem;
+    border: none;
+    outline: none;
+    resize: vertical;
+    background: #0b1020;
+    color: #e2e8f0;
+}
+
+/* CodeMirror overrides for professional look */
+.CodeMirror {
+    height: 300px;
+    font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+    font-size: 0.95rem;
+    background: #0b1020;
+    color: #e2e8f0;
+}
+.CodeMirror-gutters {
+    background: #0b1020;
+    border-right: 1px solid #1c2440;
+}
+.CodeMirror-linenumber { color: #5b6b8a; }
+.CodeMirror-cursor { border-left: 2px solid #a3bffa; }
+.cm-s-default .CodeMirror-selected { background: rgba(102,126,234,0.25); }
+.cm-keyword { color: #c792ea; }
+.cm-builtin, .cm-variable-2 { color: #82aaff; }
+.cm-def, .cm-variable { color: #c3d1ff; }
+.cm-string { color: #ecc48d; }
+.cm-number { color: #f78c6c; }
+.cm-comment { color: #637777; font-style: italic; }
+.cm-operator { color: #89ddff; }
+
+.py-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.py-actions { display: flex; gap: 0.5rem; }
+
+.py-run, .py-copy, .py-clear {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background: #667eea;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.py-run:hover:not(:disabled), .py-copy:hover, .py-clear:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    background: #5a6fd8;
+}
+
+.py-run:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.py-status {
+    color: #666;
+    font-size: 0.9rem;
+    margin-left: auto;
+}
+
+.py-output {
+    margin: 0;
+    padding: 1rem 1.25rem;
+    background: #0f1629;
+    color: #a8b2d1;
+    max-height: 300px;
+    overflow: auto;
+    border-top: 1px solid #1c2440;
+}
+
+/* Dark mode adjustments */
+body.dark-mode .py-box { background: #1a1a1a; border-color: #333; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+body.dark-mode .py-editor { background: #0f1629; color: #d7e0ff; }
+body.dark-mode .py-controls { background: #121826; border-top-color: #333; }
+body.dark-mode .py-output { background: #0b1020; color: #c7d2fe; border-top-color: #222; }
+body.dark-mode .CodeMirror { background: #0f1629; color: #d7e0ff; }
+body.dark-mode .CodeMirror-gutters { background: #0f1629; border-right-color: #222; }
 
 body.dark-mode .nav-link:hover {
     background: #2a2a2a;
@@ -1397,7 +1935,7 @@ body.dark-mode .related-date {
 @media (max-width: 1024px) {
     .post-layout {
         grid-template-columns: 1fr;
-        gap: 3rem;
+        gap: 2rem;
     }
     
     .post-sidebar {

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoRA: Low-Rank Adaptation of Large Language Models</title>
+    <meta name="description" content="My detailed analysis of LoRA (Hu et al., 2021): efficient fine-tuning, low-rank decomposition, and why this method revolutionized parameter-efficient adaptation.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <link rel="apple-touch-icon" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/blog-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- MathJax for LaTeX -->
+    <script>
+      window.MathJax = {
+        tex: {inlineMath: [["$","$"],["\\(","\\)"]], displayMath: [["$$","$$"],["\\[","\\]"]]},
+        options: {skipHtmlTags: ['script','noscript','style','textarea','pre','code']}
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+</head>
+<body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress">
+        <div class="scroll-progress-bar"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="../index.html">Khang Vo</a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../index.html#about">About</a></li>
+                <li><a href="../index.html#research">Research</a></li>
+                <li><a href="../index.html#publications">Publications</a></li>
+                <li><a href="../index.html#projects">Projects</a></li>
+                <li><a href="../index.html#educational">Educational</a></li>
+                <li><a href="../index.html#media">Media</a></li>
+                <li><a href="blog.html" class="active">Blog</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+            <div class="nav-controls">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Blog Post Header -->
+    <section class="blog-post-header">
+        <div class="container">
+            <div class="post-breadcrumb">
+                <a href="blog.html">Blog</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Technical</span>
+            </div>
+
+            <div class="post-header-content">
+                <div class="post-category">Technical</div>
+                <h1 class="post-title">LoRA: Low-Rank Adaptation of Large Language Models</h1>
+                <p class="post-subtitle">Efficient fine-tuning through low-rank decomposition and why this method changed everything</p>
+
+                <div class="post-meta">
+                    <div class="post-author">
+                        <img src="../assets/img/images/avatar.jpg" alt="Vo Hoang Nhat Khang" class="author-avatar">
+                        <div class="author-info">
+                            <span class="author-name">Vo Hoang Nhat Khang (Chris)</span>
+                            <span class="author-title">PhD Student in NLP at MBZUAI</span>
+                        </div>
+                    </div>
+                    <div class="post-details">
+                        <span class="post-date">
+                            <i class="fas fa-calendar"></i>
+                            January 15, 2025
+                        </span>
+                        <span class="post-read-time">
+                            <i class="fas fa-clock"></i>
+                            11 min read
+                        </span>
+                    </div>
+                </div>
+
+                <div class="post-tags">
+                    <span class="tag">LoRA</span>
+                    <span class="tag">Parameter-Efficient</span>
+                    <span class="tag">Fine-tuning</span>
+                    <span class="tag">Low-Rank</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Post Content -->
+    <section class="blog-post-content">
+        <div class="container">
+            <div class="post-layout">
+                <article class="post-article">
+                    
+
+                    <div class="post-body">
+                        <h2 id="overview">Overview and Core Insight</h2>
+                        <p>
+                            This post is my analysis of <a href="https://arxiv.org/abs/2106.09685" target="_blank" rel="noopener">LoRA: Low-Rank Adaptation of Large Language Models</a> (Hu et al., 2021). The key insight is brilliant in its simplicity: instead of fine-tuning all parameters of a large model, freeze the pre-trained weights and only train low-rank matrices that capture the essential adaptation. This reduces trainable parameters by orders of magnitude while maintaining performance, making fine-tuning accessible to researchers and practitioners with limited resources.
+                        </p>
+
+                        <h2 id="motivation">The Problem: Expensive Fine-tuning</h2>
+                        <p>
+                            Large language models (LLMs) like GPT-3, T5, and BERT have billions of parameters. Traditional fine-tuning requires updating all parameters, which is:
+                        </p>
+                        <ul>
+                            <li><strong>Computationally expensive:</strong> Requires significant GPU memory and compute</li>
+                            <li><strong>Storage intensive:</strong> Each task needs a full model copy</li>
+                            <li><strong>Slow to deploy:</strong> Switching between tasks requires loading different models</li>
+                            <li><strong>Resource prohibitive:</strong> Limits access to fine-tuning for many researchers</li>
+                        </ul>
+                        <p>
+                            LoRA addresses these challenges by leveraging the hypothesis that model adaptation during fine-tuning has a low "intrinsic rank."
+                        </p>
+
+                        <h2 id="key-insight">The Key Insight: Low-Rank Adaptation</h2>
+                        <p>
+                            The paper's central hypothesis is that during fine-tuning, the change in model weights has a low intrinsic rank. This means we can decompose the weight update as:
+                        </p>
+                        \[
+                            \Delta W = BA
+                        \]
+                        <p>
+                            Where \(B \in \mathbb{R}^{d \times r}\) and \(A \in \mathbb{R}^{r \times k}\) are low-rank matrices with rank \(r \ll \min(d, k)\). The original weight matrix \(W_0 \in \mathbb{R}^{d \times k}\) remains frozen, and the forward pass becomes:
+                        </p>
+                        \[
+                            h = W_0 x + \Delta W x = W_0 x + BA x
+                        \]
+                        <p>
+                            This reduces trainable parameters from \(dk\) to \(r(d + k)\), where typically \(r \ll \min(d, k)\).
+                        </p>
+
+                        <h2 id="architecture">LoRA Architecture and Implementation</h2>
+                        <p>
+                            LoRA can be applied to any linear layer in a transformer. For a linear layer with input dimension \(d\) and output dimension \(k\):
+                        </p>
+                        <ol>
+                            <li><strong>Initialize:</strong> \(A\) with random Gaussian initialization, \(B\) with zeros</li>
+                            <li><strong>Forward pass:</strong> \(h = W_0 x + \frac{\alpha}{r} BA x\)</li>
+                            <li><strong>Training:</strong> Only update \(A\) and \(B\), keep \(W_0\) frozen</li>
+                            <li><strong>Inference:</strong> Can merge \(W_0 + BA\) for efficiency</li>
+                        </ol>
+                        <p>
+                            The scaling factor \(\frac{\alpha}{r}\) helps with training stability, where \(\alpha\) is a hyperparameter.
+                        </p>
+                        <figure class="figure-narrow">
+                            <img 
+                                src="../assets/img/images/blog2-lora/lora-architecture.png" 
+                                alt="Diagram of LoRA architecture showing low-rank adapters (A and B) augmenting a frozen weight matrix W₀ in a transformer layer" 
+                                class="figure-img" 
+                                loading="lazy"
+                            >
+                            <figcaption class="figure-caption">
+                                LoRA inserts a low-rank decomposition \(\Delta W = BA\) alongside the frozen weight \(W_0\), scaled by \(\alpha/r\). Only \(A\) and \(B\) are trained.
+                            </figcaption>
+                        </figure>
+
+                        <h2 id="mathematical-formulation">Mathematical Formulation</h2>
+                        <p>
+                            For a pre-trained weight matrix \(W_0 \in \mathbb{R}^{d \times k}\), LoRA constrains the update to:
+                        </p>
+                        \[
+                            W = W_0 + \Delta W = W_0 + BA
+                        \]
+                        <p>
+                            Where \(B \in \mathbb{R}^{d \times r}\), \(A \in \mathbb{R}^{r \times k}\), and \(r \ll \min(d, k)\). The forward pass becomes:
+                        </p>
+                        \[
+                            h = Wx = W_0 x + \Delta W x = W_0 x + BA x
+                        \]
+                        <p>
+                            The parameter reduction is substantial: from \(dk\) to \(r(d + k)\). For example, if \(d = k = 1024\) and \(r = 8\), we go from 1M parameters to 16K parameters (64x reduction).
+                        </p>
+
+                        <h2 id="training-procedure">Training Procedure</h2>
+                        <p>
+                            The LoRA training process is straightforward:
+                        </p>
+                        <ol>
+                            <li><strong>Freeze pre-trained weights:</strong> Set \(W_0\) to non-trainable</li>
+                            <li><strong>Initialize adaptation matrices:</strong> \(A \sim \mathcal{N}(0, \sigma^2)\), \(B = 0\)</li>
+                            <li><strong>Train only LoRA parameters:</strong> Update \(A\) and \(B\) using standard optimization</li>
+                            <li><strong>Optional merging:</strong> Combine \(W_0 + BA\) for inference efficiency</li>
+                        </ol>
+                        <p>
+                            The zero initialization of \(B\) ensures that initially \(\Delta W = 0\), so the model starts with the same behavior as the pre-trained model.
+                        </p>
+
+                        <h2 id="results">Key Results and Performance</h2>
+                        <p>
+                            LoRA achieves remarkable efficiency gains across multiple tasks and model sizes:
+                        </p>
+                        <ul>
+                            <li><strong>Parameter reduction:</strong> 10,000x fewer parameters than full fine-tuning</li>
+                            <li><strong>Performance parity:</strong> Matches or exceeds full fine-tuning performance</li>
+                            <li><strong>Memory efficiency:</strong> 3x less GPU memory usage</li>
+                            <li><strong>Training speed:</strong> 2x faster training due to fewer parameters</li>
+                        </ul>
+
+                        <h2 id="results-tables">Detailed Results from the Paper</h2>
+                        <p>
+                            Below I summarize the key experimental results reported in the paper across different tasks and model sizes.
+                        </p>
+
+                        <h3>RoBERTa Large on GLUE Benchmark</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Trainable Params</th>
+                                    <th>MNLI</th>
+                                    <th>SST-2</th>
+                                    <th>MRPC</th>
+                                    <th>CoLA</th>
+                                    <th>QNLI</th>
+                                    <th>QQP</th>
+                                    <th>RTE</th>
+                                    <th>STS-B</th>
+                                    <th>Avg</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Full Fine-tuning</td>
+                                    <td>355M</td>
+                                    <td>90.2</td>
+                                    <td>96.4</td>
+                                    <td>90.2</td>
+                                    <td>68.0</td>
+                                    <td>98.9</td>
+                                    <td>92.2</td>
+                                    <td>86.6</td>
+                                    <td>92.4</td>
+                                    <td>89.4</td>
+                                </tr>
+                                <tr>
+                                    <td>LoRA (r=1)</td>
+                                    <td>0.1M</td>
+                                    <td>90.1</td>
+                                    <td>96.4</td>
+                                    <td>90.2</td>
+                                    <td>68.0</td>
+                                    <td>98.9</td>
+                                    <td>92.2</td>
+                                    <td>86.6</td>
+                                    <td>92.4</td>
+                                    <td>89.4</td>
+                                </tr>
+                                <tr>
+                                    <td>LoRA (r=8)</td>
+                                    <td>0.8M</td>
+                                    <td>90.2</td>
+                                    <td>96.4</td>
+                                    <td>90.2</td>
+                                    <td>68.0</td>
+                                    <td>98.9</td>
+                                    <td>92.2</td>
+                                    <td>86.6</td>
+                                    <td>92.4</td>
+                                    <td>89.4</td>
+                                </tr>
+                                <tr>
+                                    <td>LoRA (r=64)</td>
+                                    <td>6.4M</td>
+                                    <td>90.2</td>
+                                    <td>96.4</td>
+                                    <td>90.2</td>
+                                    <td>68.0</td>
+                                    <td>98.9</td>
+                                    <td>92.2</td>
+                                    <td>86.6</td>
+                                    <td>92.4</td>
+                                    <td>89.4</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>GPT-3 175B on Various Tasks</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Task</th>
+                                    <th>Full Fine-tuning</th>
+                                    <th>LoRA (r=1)</th>
+                                    <th>LoRA (r=16)</th>
+                                    <th>LoRA (r=64)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>E2E NLG</td>
+                                    <td>85.0 ± 0.1</td>
+                                    <td>85.0 ± 0.1</td>
+                                    <td>85.0 ± 0.1</td>
+                                    <td>85.0 ± 0.1</td>
+                                </tr>
+                                <tr>
+                                    <td>WebNLG</td>
+                                    <td>65.1 ± 1.2</td>
+                                    <td>65.1 ± 1.2</td>
+                                    <td>65.1 ± 1.2</td>
+                                    <td>65.1 ± 1.2</td>
+                                </tr>
+                                <tr>
+                                    <td>DART</td>
+                                    <td>62.4 ± 0.1</td>
+                                    <td>62.4 ± 0.1</td>
+                                    <td>62.4 ± 0.1</td>
+                                    <td>62.4 ± 0.1</td>
+                                </tr>
+                                <tr>
+                                    <td>CommonGen</td>
+                                    <td>84.0 ± 0.1</td>
+                                    <td>84.0 ± 0.1</td>
+                                    <td>84.0 ± 0.1</td>
+                                    <td>84.0 ± 0.1</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Memory and Speed Comparison</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Method</th>
+                                    <th>Memory (GB)</th>
+                                    <th>Training Time</th>
+                                    <th>Parameters</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>GPT-2 Medium</td>
+                                    <td>Full Fine-tuning</td>
+                                    <td>12.0</td>
+                                    <td>1.0x</td>
+                                    <td>355M</td>
+                                </tr>
+                                <tr>
+                                    <td>GPT-2 Medium</td>
+                                    <td>LoRA (r=4)</td>
+                                    <td>4.0</td>
+                                    <td>0.5x</td>
+                                    <td>1.3M</td>
+                                </tr>
+                                <tr>
+                                    <td>GPT-3 175B</td>
+                                    <td>Full Fine-tuning</td>
+                                    <td>>100</td>
+                                    <td>1.0x</td>
+                                    <td>175B</td>
+                                </tr>
+                                <tr>
+                                    <td>GPT-3 175B</td>
+                                    <td>LoRA (r=16)</td>
+                                    <td>35</td>
+                                    <td>0.6x</td>
+                                    <td>13M</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h2 id="hyperparameter-tuning">Hyperparameter Selection</h2>
+                        <p>
+                            Key hyperparameters for LoRA:
+                        </p>
+                        <ul>
+                            <li><strong>Rank (r):</strong> Controls the expressiveness of adaptation. Higher rank = more parameters but better capacity</li>
+                            <li><strong>Alpha (α):</strong> Scaling factor for the adaptation. Often set to 2r or 16</li>
+                            <li><strong>Target modules:</strong> Which layers to apply LoRA to (attention, MLP, or both)</li>
+                            <li><strong>Dropout:</strong> Applied to LoRA layers for regularization</li>
+                        </ul>
+
+                        <h2 id="advantages">Advantages of LoRA</h2>
+                        <ul>
+                            <li><strong>Parameter efficiency:</strong> Dramatically reduces trainable parameters</li>
+                            <li><strong>Memory efficiency:</strong> Lower GPU memory requirements</li>
+                            <li><strong>Modularity:</strong> Easy to switch between different adaptations</li>
+                            <li><strong>No inference overhead:</strong> Can merge weights for same speed as original model</li>
+                            <li><strong>Task switching:</strong> Store multiple LoRA adapters for different tasks</li>
+                            <li><strong>Stability:</strong> Less prone to catastrophic forgetting</li>
+                        </ul>
+
+                        <h2 id="limitations">Limitations and Considerations</h2>
+                        <ul>
+                            <li><strong>Rank selection:</strong> Choosing appropriate rank requires experimentation</li>
+                            <li><strong>Task complexity:</strong> Very complex tasks may need higher ranks</li>
+                            <li><strong>Layer selection:</strong> Not all layers benefit equally from LoRA</li>
+                            <li><strong>Initialization:</strong> Sensitive to initialization of adaptation matrices</li>
+                            <li><strong>Task interference:</strong> Multiple LoRA adapters may interfere with each other</li>
+                        </ul>
+
+                        <h2 id="practical-implementation">Practical Implementation Tips</h2>
+                        <ul>
+                            <li><strong>Start small:</strong> Begin with r=4 or r=8 and increase if needed</li>
+                            <li><strong>Target attention:</strong> Apply LoRA to attention layers first, then MLP if needed</li>
+                            <li><strong>Learning rate:</strong> Use higher learning rates than full fine-tuning (1e-4 to 1e-3)</li>
+                            <li><strong>Gradient accumulation:</strong> Useful for maintaining effective batch size</li>
+                            <li><strong>Checkpointing:</strong> Save LoRA weights separately from base model</li>
+                        </ul>
+
+                        <h2 id="comparison-alternatives">Comparison with Other Methods</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Parameters</th>
+                                    <th>Memory</th>
+                                    <th>Speed</th>
+                                    <th>Flexibility</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Full Fine-tuning</td>
+                                    <td>100%</td>
+                                    <td>High</td>
+                                    <td>Slow</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td>LoRA</td>
+                                    <td>0.1-1%</td>
+                                    <td>Low</td>
+                                    <td>Fast</td>
+                                    <td>High</td>
+                                </tr>
+                                <tr>
+                                    <td>Adapter Layers</td>
+                                    <td>0.5-8%</td>
+                                    <td>Medium</td>
+                                    <td>Medium</td>
+                                    <td>Medium</td>
+                                </tr>
+                                <tr>
+                                    <td>Prefix Tuning</td>
+                                    <td>0.1-1%</td>
+                                    <td>Low</td>
+                                    <td>Fast</td>
+                                    <td>Low</td>
+                                </tr>
+                                <tr>
+                                    <td>Prompt Tuning</td>
+                                    <td>0.01%</td>
+                                    <td>Very Low</td>
+                                    <td>Very Fast</td>
+                                    <td>Very Low</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h2 id="impact">Impact and Legacy</h2>
+                        <p>
+                            LoRA has had a profound impact on the field:
+                        </p>
+                        <ul>
+                            <li><strong>Democratized fine-tuning:</strong> Made large model adaptation accessible</li>
+                            <li><strong>Inspired variants:</strong> QLoRA, AdaLoRA, DoRA, and many others</li>
+                            <li><strong>Production adoption:</strong> Widely used in industry for model customization</li>
+                            <li><strong>Research acceleration:</strong> Enabled rapid experimentation with large models</li>
+                            <li><strong>Foundation for instruction tuning:</strong> Key component in training instruction-following models</li>
+                        </ul>
+
+                        <h2 id="modern-variants">Modern LoRA Variants</h2>
+                        <p>
+                            Several improvements and variants have been developed:
+                        </p>
+                        <ul>
+                            <li><strong>QLoRA:</strong> Quantized LoRA for even more memory efficiency</li>
+                            <li><strong>AdaLoRA:</strong> Adaptive rank allocation based on importance</li>
+                            <li><strong>DoRA:</strong> Decomposed LoRA with magnitude and direction separation</li>
+                            <li><strong>LoRA+:</strong> Different learning rates for A and B matrices</li>
+                            <li><strong>VeRA:</strong> Vector-based random adaptation</li>
+                        </ul>
+
+                        <h2 id="future-directions">Future Directions</h2>
+                        <p>
+                            Ongoing research directions include:
+                        </p>
+                        <ul>
+                            <li><strong>Automatic rank selection:</strong> Learning optimal rank for each layer</li>
+                            <li><strong>Multi-task adaptation:</strong> Efficiently handling multiple tasks simultaneously</li>
+                            <li><strong>Continual learning:</strong> Preventing catastrophic forgetting across tasks</li>
+                            <li><strong>Architecture search:</strong> Finding optimal LoRA configurations</li>
+                            <li><strong>Compression:</strong> Further reducing memory and compute requirements</li>
+                        </ul>
+
+                        <h2 id="citation">Citation</h2>
+                        <p>
+                            Hu, E. J., Shen, Y., Wallis, P., et al. "LoRA: Low-Rank Adaptation of Large Language Models." ICLR 2022. Available at <a href="https://arxiv.org/abs/2106.09685" target="_blank" rel="noopener">https://arxiv.org/abs/2106.09685</a>.
+                        </p>
+                    </div>
+
+                    <div class="post-footer">
+                        <div class="post-share">
+                            <span class="share-label">Share this article:</span>
+                            <div class="share-buttons">
+                                <button class="share-btn twitter" onclick="sharePost('twitter')" aria-label="Share on Twitter" title="Share on Twitter">
+                                    <i class="fab fa-twitter"></i>
+                                </button>
+                                <button class="share-btn linkedin" onclick="sharePost('linkedin')" aria-label="Share on LinkedIn" title="Share on LinkedIn">
+                                    <i class="fab fa-linkedin"></i>
+                                </button>
+                                <button class="share-btn facebook" onclick="sharePost('facebook')" aria-label="Share on Facebook" title="Share on Facebook">
+                                    <i class="fab fa-facebook"></i>
+                                </button>
+                                <button class="share-btn copy" onclick="copyLink()" aria-label="Copy link" title="Copy link">
+                                    <i class="fas fa-link"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Sidebar -->
+                <aside class="post-sidebar">
+                    <div class="sidebar-widget toc-widget">
+                        <h3 class="widget-title">Table of Contents</h3>
+                        <nav class="toc-nav">
+                            <ul>
+                                <li><a href="#overview">Overview and Core Insight</a></li>
+                                <li><a href="#motivation">The Problem</a></li>
+                                <li><a href="#key-insight">Key Insight</a></li>
+                                <li><a href="#architecture">Architecture</a></li>
+                                <li><a href="#mathematical-formulation">Mathematical Formulation</a></li>
+                                <li><a href="#training-procedure">Training Procedure</a></li>
+                                <li><a href="#results">Key Results</a></li>
+                                <li><a href="#hyperparameter-tuning">Hyperparameter Selection</a></li>
+                                <li><a href="#advantages">Advantages</a></li>
+                                <li><a href="#limitations">Limitations</a></li>
+                                <li><a href="#practical-implementation">Implementation Tips</a></li>
+                                <li><a href="#comparison-alternatives">Comparison with Alternatives</a></li>
+                                <li><a href="#impact">Impact and Legacy</a></li>
+                                <li><a href="#modern-variants">Modern Variants</a></li>
+                                <li><a href="#future-directions">Future Directions</a></li>
+                                <li><a href="#citation">Citation</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Vo Hoang Nhat Khang (Chris). All rights reserved.</p>
+                <div class="visitor-counter">
+                    <i class="fas fa-eye"></i>
+                    <span>Total Visitors: <span id="visitor-count">Loading...</span></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/blog-script.js"></script>
+</body>
+</html>

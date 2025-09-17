@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attention is All You Need: The Transformer Architecture</title>
+    <meta name="description" content="My detailed analysis of the Transformer architecture (Vaswani et al., 2017): self-attention, multi-head attention, and why this paper revolutionized NLP.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <link rel="apple-touch-icon" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/blog-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- MathJax for LaTeX -->
+    <script>
+      window.MathJax = {
+        tex: {inlineMath: [["$","$"],["\\(","\\)"]], displayMath: [["$$","$$"],["\\[","\\]"]]},
+        options: {skipHtmlTags: ['script','noscript','style','textarea','pre','code']}
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+</head>
+<body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress">
+        <div class="scroll-progress-bar"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="../index.html">Khang Vo</a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../index.html#about">About</a></li>
+                <li><a href="../index.html#research">Research</a></li>
+                <li><a href="../index.html#publications">Publications</a></li>
+                <li><a href="../index.html#projects">Projects</a></li>
+                <li><a href="../index.html#educational">Educational</a></li>
+                <li><a href="../index.html#media">Media</a></li>
+                <li><a href="blog.html" class="active">Blog</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+            <div class="nav-controls">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Blog Post Header -->
+    <section class="blog-post-header">
+        <div class="container">
+            <div class="post-breadcrumb">
+                <a href="blog.html">Blog</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Technical</span>
+            </div>
+
+            <div class="post-header-content">
+                <div class="post-category">Technical</div>
+                <h1 class="post-title">Attention is All You Need: The Transformer Architecture</h1>
+                <p class="post-subtitle">How self-attention mechanisms revolutionized sequence modeling and why this paper changed everything</p>
+
+                <div class="post-meta">
+                    <div class="post-author">
+                        <img src="../assets/img/images/avatar.jpg" alt="Vo Hoang Nhat Khang" class="author-avatar">
+                        <div class="author-info">
+                            <span class="author-name">Vo Hoang Nhat Khang (Chris)</span>
+                            <span class="author-title">PhD Student in NLP at MBZUAI</span>
+                        </div>
+                    </div>
+                    <div class="post-details">
+                        <span class="post-date">
+                            <i class="fas fa-calendar"></i>
+                            January 15, 2025
+                        </span>
+                        <span class="post-read-time">
+                            <i class="fas fa-clock"></i>
+                            13 min read
+                        </span>
+                    </div>
+                </div>
+
+                <div class="post-tags">
+                    <span class="tag">Transformer</span>
+                    <span class="tag">Attention</span>
+                    <span class="tag">NLP</span>
+                    <span class="tag">Sequence Modeling</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Post Content -->
+    <section class="blog-post-content">
+        <div class="container">
+            <div class="post-layout">
+                <article class="post-article">
+                    
+
+                    <div class="post-body">
+                        <h2 id="overview">Overview and Revolutionary Impact</h2>
+                        <p>
+                            This post is my analysis of <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Attention is All You Need</a> (Vaswani et al., 2017), the paper that introduced the Transformer architecture. This work fundamentally changed natural language processing by showing that attention mechanisms alone—without recurrence or convolution—could achieve state-of-the-art results. The Transformer became the foundation for virtually all modern language models, from BERT to GPT to T5, and its influence extends far beyond NLP into computer vision, speech processing, and beyond.
+                        </p>
+                        
+
+                        <h2 id="motivation">The Problem: RNNs and CNNs Limitations</h2>
+                        <p>
+                            Before Transformers, sequence modeling relied heavily on recurrent neural networks (RNNs) and convolutional neural networks (CNNs). These architectures had significant limitations:
+                        </p>
+                        <ul>
+                            <li><strong>Sequential processing:</strong> RNNs process sequences step-by-step, making parallelization difficult</li>
+                            <li><strong>Vanishing gradients:</strong> Long-range dependencies are hard to learn due to gradient decay</li>
+                            <li><strong>Computational inefficiency:</strong> Sequential nature limits training speed</li>
+                            <li><strong>Memory constraints:</strong> Hidden states must be maintained throughout the sequence</li>
+                        </ul>
+                        <p>
+                            The Transformer's key insight was to replace recurrence and convolution entirely with attention mechanisms, enabling parallel processing and better long-range dependency modeling.
+                        </p>
+                        
+
+                        <h2 id="attention-mechanism">The Core: Self-Attention Mechanism</h2>
+                        <p>
+                            Self-attention allows each position in a sequence to attend to all positions in the same sequence. For a sequence of length \(n\) with input representations \(\mathbf{x} = (x_1, \ldots, x_n)\), the self-attention mechanism computes:
+                        </p>
+                        \[
+                            \text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}\right)\mathbf{V}
+                        \]
+                        <p>
+                            Where \(\mathbf{Q}\), \(\mathbf{K}\), and \(\mathbf{V}\) are the query, key, and value matrices respectively, and \(d_k\) is the dimension of the key vectors. The scaling factor \(\frac{1}{\sqrt{d_k}}\) prevents the dot products from becoming too large.
+                        </p>
+
+                        <figure class="figure-narrow figure-small">
+                            <img
+                                src="../assets/img/images/blog4-transformer/scaled-dot.png"
+                                alt="Scaled dot-product attention: softmax(QK^T / sqrt(d_k)) V"
+                                class="figure-img"
+                                loading="lazy"
+                            >
+                            <figcaption class="figure-caption">
+                                Scaled dot-product attention: similarities \(\mathbf{Q}\mathbf{K}^T\) are scaled by \(\sqrt{d_k}\), normalized with softmax, then applied to \(\mathbf{V}\).
+                            </figcaption>
+                        </figure>
+
+                        <div class="py-runner" data-template="self_attention"></div>
+                        <p class="note-muted">You can edit the code above and click Run to experiment with a tiny attention toy example directly in the browser (powered by Pyodide).</p>
+
+                        <h2 id="multi-head-attention">Multi-Head Attention</h2>
+                        <p>
+                            Instead of performing attention once, the Transformer uses multiple "heads" in parallel:
+                        </p>
+                        \[
+                            \text{MultiHead}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\mathbf{W}^O
+                        \]
+                        <p>
+                            Where each head is:
+                        </p>
+                        \[
+                            \text{head}_i = \text{Attention}(\mathbf{Q}\mathbf{W}_i^Q, \mathbf{K}\mathbf{W}_i^K, \mathbf{V}\mathbf{W}_i^V)
+                        \]
+                        <p>
+                            This allows the model to attend to different types of relationships simultaneously—syntactic, semantic, positional, etc.
+                        </p>
+                        
+                        <figure class="figure-narrow">
+                            <img
+                                src="../assets/img/images/blog4-transformer/multi-head.png"
+                                alt="Multi-head attention: multiple parallel attention heads concatenated and projected"
+                                class="figure-img"
+                                loading="lazy"
+                            >
+                            <figcaption class="figure-caption">
+                                Multi-head attention runs several attention heads in parallel, then concatenates and projects them to mix information from different representation subspaces.
+                            </figcaption>
+                        </figure>
+                        
+
+                        <h2 id="architecture">Complete Transformer Architecture</h2>
+                        <p>
+                            The Transformer uses an encoder-decoder architecture:
+                        </p>
+                        <ol>
+                            <li><strong>Encoder:</strong> Maps input sequence to continuous representations</li>
+                            <li><strong>Decoder:</strong> Generates output sequence one element at a time</li>
+                            <li><strong>Attention connections:</strong> Decoder attends to encoder outputs</li>
+                        </ol>
+
+                        <figure class="figure-narrow">
+                            <img
+                                src="../assets/img/images/blog4-transformer/transformer-architecture.png"
+                                alt="Transformer encoder-decoder architecture with self-attention, cross-attention, and feed-forward layers"
+                                class="figure-img"
+                                loading="lazy"
+                            >
+                            <figcaption class="figure-caption">
+                                High-level Transformer architecture: stacked encoder and decoder blocks with self-attention, cross-attention, residual connections, and feed-forward networks.
+                            </figcaption>
+                        </figure>
+
+                        <h3>Encoder Layer</h3>
+                        <p>
+                            Each encoder layer consists of:
+                        </p>
+                        \[
+                            \mathbf{x} = \text{LayerNorm}(\mathbf{x} + \text{MultiHeadAttention}(\mathbf{x}))
+                        \]
+                        \[
+                            \mathbf{x} = \text{LayerNorm}(\mathbf{x} + \text{FFN}(\mathbf{x}))
+                        \]
+                        <p>
+                            Where FFN is a position-wise feed-forward network: \(\text{FFN}(x) = \max(0, xW_1 + b_1)W_2 + b_2\)
+                        </p>
+
+                        <h3>Decoder Layer</h3>
+                        <p>
+                            Each decoder layer has three sub-layers:
+                        </p>
+                        <ol>
+                            <li><strong>Masked self-attention:</strong> Prevents attending to future positions</li>
+                            <li><strong>Encoder-decoder attention:</strong> Attends to encoder outputs</li>
+                            <li><strong>Position-wise FFN:</strong> Same as encoder</li>
+                        </ol>
+
+                        <h2 id="positional-encoding">Positional Encoding</h2>
+                        <p>
+                            Since Transformers have no inherent notion of position, positional encodings are added to input embeddings:
+                        </p>
+                        \[
+                            PE_{(pos, 2i)} = \sin(pos / 10000^{2i/d_{model}})
+                        \]
+                        \[
+                            PE_{(pos, 2i+1)} = \cos(pos / 10000^{2i/d_{model}})
+                        \]
+                        <p>
+                            Where \(pos\) is the position and \(i\) is the dimension. This allows the model to understand relative and absolute positions.
+                        </p>
+                        
+
+
+                        <h2 id="training">Training Details and Optimization</h2>
+                        <p>
+                            The paper uses several key training techniques:
+                        </p>
+                        <ul>
+                            <li><strong>Optimizer:</strong> Adam with \(\beta_1 = 0.9\), \(\beta_2 = 0.98\), \(\epsilon = 10^{-9}\)</li>
+                            <li><strong>Learning rate:</strong> \(lrate = d_{model}^{-0.5} \cdot \min(step\_num^{-0.5}, step\_num \cdot warmup\_steps^{-1.5})\)</li>
+                            <li><strong>Regularization:</strong> Dropout (\(p = 0.1\)) and label smoothing (\(\epsilon_{ls} = 0.1\))</li>
+                            <li><strong>Batch size:</strong> 25,000 tokens per batch</li>
+                        </ul>
+                        
+
+                        <h2 id="results">Key Results and Performance</h2>
+                        <p>
+                            The Transformer achieved state-of-the-art results on machine translation:
+                        </p>
+                        <ul>
+                            <li><strong>WMT 2014 English-German:</strong> 28.4 BLEU (vs. 25.16 for previous best)</li>
+                            <li><strong>WMT 2014 English-French:</strong> 41.8 BLEU (vs. 40.46 for previous best)</li>
+                            <li><strong>Training time:</strong> 3.5 days on 8 P100 GPUs (vs. weeks for RNNs)</li>
+                            <li><strong>Parallelization:</strong> Much better than RNNs due to attention mechanism</li>
+                        </ul>
+                        
+
+                        <h2 id="results-tables">Detailed Results from the Paper</h2>
+                        <p>
+                            Below I summarize the key experimental results reported in the paper across different tasks and model sizes.
+                        </p>
+
+                        <h3>Machine Translation Results</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>WMT 2014 EN-DE BLEU</th>
+                                    <th>WMT 2014 EN-FR BLEU</th>
+                                    <th>Training Time</th>
+                                    <th>Parameters</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Transformer (base)</td>
+                                    <td>28.4</td>
+                                    <td>41.8</td>
+                                    <td>12 hours</td>
+                                    <td>65M</td>
+                                </tr>
+                                <tr>
+                                    <td>Transformer (big)</td>
+                                    <td>28.9</td>
+                                    <td>41.4</td>
+                                    <td>3.5 days</td>
+                                    <td>213M</td>
+                                </tr>
+                                <tr>
+                                    <td>ConvS2S</td>
+                                    <td>25.16</td>
+                                    <td>40.46</td>
+                                    <td>9 days</td>
+                                    <td>38M</td>
+                                </tr>
+                                <tr>
+                                    <td>ByteNet</td>
+                                    <td>23.75</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>GNMT</td>
+                                    <td>24.6</td>
+                                    <td>39.92</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Model Variants and Ablations</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Model Variant</th>
+                                    <th>EN-DE BLEU</th>
+                                    <th>Parameters</th>
+                                    <th>Training Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Transformer (6 layers)</td>
+                                    <td>28.4</td>
+                                    <td>65M</td>
+                                    <td>12 hours</td>
+                                </tr>
+                                <tr>
+                                    <td>Transformer (2 layers)</td>
+                                    <td>27.3</td>
+                                    <td>37M</td>
+                                    <td>6 hours</td>
+                                </tr>
+                                <tr>
+                                    <td>Transformer (1 layer)</td>
+                                    <td>26.5</td>
+                                    <td>28M</td>
+                                    <td>3 hours</td>
+                                </tr>
+                                <tr>
+                                    <td>Single-head attention</td>
+                                    <td>27.3</td>
+                                    <td>65M</td>
+                                    <td>12 hours</td>
+                                </tr>
+                                <tr>
+                                    <td>No positional encoding</td>
+                                    <td>26.8</td>
+                                    <td>65M</td>
+                                    <td>12 hours</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Computational Complexity Comparison</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Layer Type</th>
+                                    <th>Complexity per Layer</th>
+                                    <th>Sequential Operations</th>
+                                    <th>Maximum Path Length</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Self-Attention</td>
+                                    <td>O(n²d)</td>
+                                    <td>O(1)</td>
+                                    <td>O(1)</td>
+                                </tr>
+                                <tr>
+                                    <td>Recurrent</td>
+                                    <td>O(nd²)</td>
+                                    <td>O(n)</td>
+                                    <td>O(n)</td>
+                                </tr>
+                                <tr>
+                                    <td>Convolutional</td>
+                                    <td>O(knd²)</td>
+                                    <td>O(1)</td>
+                                    <td>O(log_k(n))</td>
+                                </tr>
+                                <tr>
+                                    <td>Self-Attention (restricted)</td>
+                                    <td>O(rn²d)</td>
+                                    <td>O(1)</td>
+                                    <td>O(n/r)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h2 id="advantages">Key Advantages of Transformers</h2>
+                        <ul>
+                            <li><strong>Parallelization:</strong> All positions can be processed simultaneously</li>
+                            <li><strong>Long-range dependencies:</strong> Direct connections between any two positions</li>
+                            <li><strong>Interpretability:</strong> Attention weights provide insights into model behavior</li>
+                            <li><strong>Flexibility:</strong> Can handle variable-length sequences naturally</li>
+                            <li><strong>Efficiency:</strong> Faster training than RNNs for long sequences</li>
+                        </ul>
+                        
+
+                        <h2 id="limitations">Limitations and Challenges</h2>
+                        <ul>
+                            <li><strong>Quadratic complexity:</strong> Attention scales as O(n²) with sequence length</li>
+                            <li><strong>Memory requirements:</strong> Attention matrices can be very large</li>
+                            <li><strong>Position encoding:</strong> Fixed positional encodings may not generalize well</li>
+                            <li><strong>Inductive bias:</strong> Less built-in structure compared to RNNs/CNNs</li>
+                            <li><strong>Training instability:</strong> Can be sensitive to hyperparameters</li>
+                        </ul>
+                        
+
+                        <h2 id="attention-patterns">Understanding Attention Patterns</h2>
+                        <p>
+                            The paper provides fascinating insights into what Transformers learn:
+                        </p>
+                        <ul>
+                            <li><strong>Syntactic relationships:</strong> Attention often focuses on grammatically related words</li>
+                            <li><strong>Semantic similarity:</strong> Similar words tend to attend to each other</li>
+                            <li><strong>Positional patterns:</strong> Some heads learn to attend to nearby positions</li>
+                            <li><strong>Task-specific patterns:</strong> Different heads specialize for different linguistic phenomena</li>
+                        </ul>
+                        
+
+                        <h2 id="practical-implementation">Practical Implementation Tips</h2>
+                        <ul>
+                            <li><strong>Gradient clipping:</strong> Essential for training stability</li>
+                            <li><strong>Warmup schedule:</strong> Critical for convergence</li>
+                            <li><strong>Label smoothing:</strong> Improves generalization</li>
+                            <li><strong>Layer normalization:</strong> Applied before sub-layers, not after</li>
+                            <li><strong>Residual connections:</strong> Around each sub-layer</li>
+                        </ul>
+                        
+
+                        <h2 id="impact">Revolutionary Impact and Legacy</h2>
+                        <p>
+                            The Transformer architecture has had an unprecedented impact:
+                        </p>
+                        <ul>
+                            <li><strong>Foundation for modern LLMs:</strong> BERT, GPT, T5, PaLM, ChatGPT, etc.</li>
+                            <li><strong>Beyond NLP:</strong> Vision Transformers, speech processing, multimodal models</li>
+                            <li><strong>Research acceleration:</strong> Enabled rapid progress in AI</li>
+                            <li><strong>Industry adoption:</strong> Used in virtually all production language systems</li>
+                            <li><strong>New paradigms:</strong> Prompting, in-context learning, instruction following</li>
+                        </ul>
+                        
+
+                        <h2 id="modern-variants">Modern Transformer Variants</h2>
+                        <p>
+                            Countless improvements and variants have been developed:
+                        </p>
+                        <ul>
+                            <li><strong>Efficient attention:</strong> Sparse, linear, and other approximations</li>
+                            <li><strong>Architecture variants:</strong> Decoder-only, encoder-only, prefix-LM</li>
+                            <li><strong>Scaling laws:</strong> Understanding how performance scales with size</li>
+                            <li><strong>Multimodal extensions:</strong> CLIP, DALL-E, GPT-4V</li>
+                            <li><strong>Specialized variants:</strong> Longformer, BigBird, Performer</li>
+                        </ul>
+                        
+
+                        <h2 id="future-directions">Future Directions and Open Questions</h2>
+                        <p>
+                            Ongoing research areas include:
+                        </p>
+                        <ul>
+                            <li><strong>Efficiency:</strong> Reducing computational and memory requirements</li>
+                            <li><strong>Long sequences:</strong> Handling very long contexts effectively</li>
+                            <li><strong>Reasoning:</strong> Improving logical and mathematical reasoning</li>
+                            <li><strong>Multimodality:</strong> Integrating vision, audio, and other modalities</li>
+                            <li><strong>Interpretability:</strong> Understanding what models learn and how</li>
+                        </ul>
+
+                        <h2 id="mathematical-intuition">Mathematical Intuition</h2>
+                        <p>
+                            The attention mechanism can be understood as a differentiable way to:
+                        </p>
+                        <ol>
+                            <li><strong>Compute similarities:</strong> \(\mathbf{Q}\mathbf{K}^T\) measures how much each query should attend to each key</li>
+                            <li><strong>Normalize attention:</strong> Softmax ensures attention weights sum to 1</li>
+                            <li><strong>Weighted combination:</strong> \(\mathbf{V}\) values are combined according to attention weights</li>
+                        </ol>
+                        <p>
+                            This creates a flexible, learnable mechanism for information routing in sequences.
+                        </p>
+                        
+
+                        <h2 id="citation">Citation</h2>
+                        <p>
+                            Vaswani, A., Shazeer, N., Parmar, N., et al. "Attention is All You Need." NeurIPS 2017. Available at <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">https://arxiv.org/abs/1706.03762</a>.
+                        </p>
+                    </div>
+
+                    <div class="post-footer">
+                        <div class="post-share">
+                            <span class="share-label">Share this article:</span>
+                            <div class="share-buttons">
+                                <button class="share-btn twitter" onclick="sharePost('twitter')" aria-label="Share on Twitter" title="Share on Twitter">
+                                    <i class="fab fa-twitter"></i>
+                                </button>
+                                <button class="share-btn linkedin" onclick="sharePost('linkedin')" aria-label="Share on LinkedIn" title="Share on LinkedIn">
+                                    <i class="fab fa-linkedin"></i>
+                                </button>
+                                <button class="share-btn facebook" onclick="sharePost('facebook')" aria-label="Share on Facebook" title="Share on Facebook">
+                                    <i class="fab fa-facebook"></i>
+                                </button>
+                                <button class="share-btn copy" onclick="copyLink()" aria-label="Copy link" title="Copy link">
+                                    <i class="fas fa-link"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Sidebar -->
+                <aside class="post-sidebar">
+                    <div class="sidebar-widget toc-widget">
+                        <h3 class="widget-title">Table of Contents</h3>
+                        <nav class="toc-nav">
+                            <ul>
+                                <li><a href="#overview">Overview and Impact</a></li>
+                                <li><a href="#motivation">The Problem</a></li>
+                                <li><a href="#attention-mechanism">Self-Attention</a></li>
+                                <li><a href="#multi-head-attention">Multi-Head Attention</a></li>
+                                <li><a href="#architecture">Architecture</a></li>
+                                <li><a href="#positional-encoding">Positional Encoding</a></li>
+                                <li><a href="#mathematical-details">Mathematical Details</a></li>
+                                <li><a href="#training">Training Details</a></li>
+                                <li><a href="#results">Key Results</a></li>
+                                <li><a href="#advantages">Advantages</a></li>
+                                <li><a href="#limitations">Limitations</a></li>
+                                <li><a href="#attention-patterns">Attention Patterns</a></li>
+                                <li><a href="#practical-implementation">Implementation Tips</a></li>
+                                <li><a href="#impact">Impact and Legacy</a></li>
+                                <li><a href="#modern-variants">Modern Variants</a></li>
+                                <li><a href="#future-directions">Future Directions</a></li>
+                                <li><a href="#mathematical-intuition">Mathematical Intuition</a></li>
+                                <li><a href="#citation">Citation</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Vo Hoang Nhat Khang (Chris). All rights reserved.</p>
+                <div class="visitor-counter">
+                    <i class="fas fa-eye"></i>
+                    <span>Total Visitors: <span id="visitor-count">Loading...</span></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/blog-script.js"></script>
+</body>
+</html>

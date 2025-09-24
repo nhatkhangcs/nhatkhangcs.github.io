@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Vo Hoang Nhat Khang (Chris) | Professional Insights on AI & NLP</title>
+    <meta name="description" content="Professional blog by Vo Hoang Nhat Khang (Chris) - PhD Student in NLP. Insights on AI, Machine Learning, Natural Language Processing, and Multimodal Systems.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <link rel="apple-touch-icon" href="../favicon.svg">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/blog-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress">
+        <div class="scroll-progress-bar"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="../index.html">Khang Vo</a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../index.html#about">About</a></li>
+                <li><a href="../index.html#research">Research</a></li>
+                <li><a href="../index.html#publications">Publications</a></li>
+                <li><a href="../index.html#projects">Projects</a></li>
+                <li><a href="../index.html#educational">Educational</a></li>
+                <li><a href="../index.html#media">Media</a></li>
+                <li><a href="blog.html" class="active">Blog</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+            <div class="nav-controls">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Blog Header -->
+    <section class="blog-hero">
+        <div class="container">
+            <div class="blog-hero-content">
+                <h1 class="blog-hero-title">Knowledge Hub & Notes</h1>
+                <p class="blog-hero-subtitle">Short-form posts about things I'm learning, building, and thinking. Expect rough edges, quick tips, and honest notes.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Content -->
+    <section class="blog-content">
+        <div class="container">
+            <div class="blog-layout">
+                <!-- Main Blog Area -->
+                <main class="blog-main">
+                    <h3 class="section-title section-title--compact">Available</h3>
+                    <div class="blog-posts-grid" id="blog-posts-grid">
+                        <article class="blog-post" data-tags="Transformer,Attention,NLP,Sequence Modeling" data-search="Attention is All You Need Transformer Architecture self-attention sequence modeling NLP">
+                            <div class="post-image">
+                                <a href="transformer-analysis.html">
+                                    <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80" alt="Transformer Architecture">
+                                </a>
+                                <div class="post-category">Technical</div>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-meta">
+                                    <span class="post-date"><i class="fas fa-calendar"></i> Jan 15, 2025</span>
+                                    <span class="post-read-time"><i class="fas fa-clock"></i> 15 min read</span>
+                                </div>
+                                <h3 class="post-title"><a href="transformer-analysis.html">Attention is All You Need: The Transformer Architecture</a></h3>
+                                <p class="post-excerpt">The paper that changed everything: how attention mechanisms replaced RNNs and became the foundation for all modern language models.</p>
+                                <div class="post-tags">
+                                    <span class="tag">Transformer</span>
+                                    <span class="tag">Attention</span>
+                                    <span class="tag">NLP</span>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="blog-post" data-tags="CLIP,Zero-shot,Multimodal,Contrastive Learning" data-search="CLIP Learning Transferable Visual Models Natural Language Supervision contrastive zero-shot multimodal">
+                            <div class="post-image">
+                                <a href="clip-analysis.html">
+                                    <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=800&q=80" alt="CLIP Analysis">
+                                </a>
+                                <div class="post-category">Technical</div>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-meta">
+                                    <span class="post-date"><i class="fas fa-calendar"></i> Sep 15, 2025</span>
+                                    <span class="post-read-time"><i class="fas fa-clock"></i> 12 min read</span>
+                                </div>
+                                <h3 class="post-title"><a href="clip-analysis.html">CLIP: Learning Transferable Visual Models From Natural Language Supervision</a></h3>
+                                <p class="post-excerpt">How CLIP learned to see the world through natural language descriptions, and why this changed everything about computer vision.</p>
+                                <div class="post-tags">
+                                    <span class="tag">CLIP</span>
+                                    <span class="tag">Zero-shot</span>
+                                    <span class="tag">Multimodal</span>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                </main>
+
+                <!-- Sidebar -->
+                <aside class="blog-sidebar">
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title">Search Posts</h3>
+                        <div class="search-box">
+                            <input type="text" id="search-input" placeholder="Search blog posts..." class="search-input">
+                            <button id="search-btn" class="search-btn" aria-label="Search posts" title="Search posts">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <div class="search-results" id="search-results">
+                            <!-- Search results will appear here -->
+                        </div>
+                    </div>
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title">About</h3>
+                        <p>Short-form posts about things I'm learning, building, and thinking. Expect rough edges, quick tips, and honest notes.</p>
+                    </div>
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title">Popular Tags</h3>
+                        <div class="tag-cloud">
+                            <a href="#" class="tag-link">NLP</a>
+                            <a href="#" class="tag-link">Multimodal</a>
+                            <a href="#" class="tag-link">VLM</a>
+                            <a href="#" class="tag-link">Tips</a>
+                            <a href="#" class="tag-link">Notes</a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Vo Hoang Nhat Khang (Chris). All rights reserved.</p>
+                <div class="visitor-counter">
+                    <i class="fas fa-eye"></i>
+                    <span>Total Visitors: <span id="visitor-count">Loading...</span></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/blog-script.js"></script>
+</body>
+</html>
+

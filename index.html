@@ -11,7 +11,7 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" href="favicon.svg">
     <link rel="stylesheet" href="assets/css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -35,7 +35,6 @@
                 <li><a href="#projects">Projects</a></li>
                 <li><a href="#educational">Educational</a></li>
                 <li><a href="#media">Media</a></li>
-                <li><a href="blog/blog.html">Blog</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
             <div class="nav-controls">
@@ -56,17 +55,42 @@
         <div class="animated-bg"></div>
         <div class="floating-particles"></div>
         <div class="hero-container">
-            <div class="hero-content">
+            <div class="hero-content hero-content-panel">
                 <h1 class="hero-title" data-text="Vo Hoang Nhat Khang (Chris)">Vo Hoang Nhat Khang (Chris)</h1>
                 <h2 class="hero-subtitle">PhD Student in Natural Language Processing</h2>
+                <div class="hero-affiliation-row" aria-label="Affiliation">
+                    <img src="assets/img/images/MBZUAI_logo.png" alt="MBZUAI Logo" class="hero-affiliation-logo">
+                    <div class="hero-affiliation-text">
+                        <span class="hero-affiliation-label">PhD Affiliation</span>
+                        <strong>Mohamed bin Zayed University of Artificial Intelligence</strong>
+                    </div>
+                </div>
                 <p class="hero-description">
                     Researching state-of-the-art AI methods in NLP and Multimodal Large Language Models at 
                     <strong>Mohamed bin Zayed University of Artificial Intelligence (MBZUAI)</strong>
                 </p>
-                <div class="hero-location">
-                    <div class="location-info">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Currently at MBZUAI, Abu Dhabi, UAE</span>
+                <div class="hero-chips" aria-label="Primary expertise">
+                    <span class="hero-chip">Vision-Language Model</span>
+                    <span class="hero-chip">Uncertainty Estimation</span>
+                    <span class="hero-chip">Multimodal Learning</span>
+                </div>
+                <div class="hero-route" aria-label="Academic journey">
+                    <div class="hero-route-stop">
+                        <img src="assets/img/images/Vietnam.png" alt="Vietnam Flag" class="hero-country-flag">
+                        <div class="hero-route-text">
+                            <span class="hero-route-label">From</span>
+                            <strong>Vietnam</strong>
+                        </div>
+                    </div>
+                    <div class="hero-route-connector" aria-hidden="true">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="hero-route-stop">
+                        <img src="assets/img/images/UAE.png" alt="UAE Flag" class="hero-country-flag">
+                        <div class="hero-route-text">
+                            <span class="hero-route-label">Now at</span>
+                            <strong>Abu Dhabi, UAE</strong>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -132,6 +156,10 @@
                         <i class="fas fa-graduation-cap"></i>
                         <div>
                             <h4>Education</h4>
+                            <div class="education-brand">
+                                <img src="assets/img/images/MBZUAI_logo.png" alt="MBZUAI Logo" class="education-logo">
+                                <span>MBZUAI</span>
+                            </div>
                             <p>PhD in NLP at MBZUAI (2025-Present)</p>
                             <p>BSc in Computer Science at HCMUT-VNU (2021-2024)</p>
                         </div>
@@ -165,29 +193,22 @@
                     <div class="research-icon">
                         <i class="fas fa-eye"></i>
                     </div>
-                    <h3>Multimodal Learning</h3>
-                    <p>Advanced techniques for learning across multiple modalities including text, image, audio, and video data for comprehensive AI understanding.</p>
+                    <h3>VLM</h3>
+                    <p>Vision-language models for text and image understanding, interpretation, and alignment.</p>
                 </div>
                 <div class="research-card">
                     <div class="research-icon">
                         <i class="fas fa-robot"></i>
                     </div>
-                    <h3>Multimodal Large Language Models</h3>
-                    <p>Development and optimization of large language models that can process and understand multiple data types simultaneously.</p>
+                    <h3>Uncertainty Estimation</h3>
+                    <p>Methods for quantifying model confidence and reliability, including calibration and uncertainty-aware inference in language and multimodal systems.</p>
                 </div>
                 <div class="research-card">
                     <div class="research-icon">
                         <i class="fas fa-brain"></i>
                     </div>
-                    <h3>Large Language Models</h3>
-                    <p>Research in LLM architecture, fine-tuning, retrieval-augmented generation, and explainable AI systems.</p>
-                </div>
-                <div class="research-card">
-                    <div class="research-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3>AI Applications</h3>
-                    <p>Practical applications of AI in healthcare, education, and sustainable development with focus on Vietnamese language and culture.</p>
+                    <h3>Multimodal Learning</h3>
+                    <p>Foundation models and methods to make multimodal learning more efficient.</p>
                 </div>
             </div>
         </div>
@@ -198,65 +219,85 @@
         <div class="container">
             <h2 class="section-title">Research Publications</h2>
             <div class="publications-content">
-                    <div class="publication-item">
-                        <div class="publication-year">2025</div>
-                        <div class="publication-content">
-                            <h3>Bridging LLMs and Symbolic Reasoning in Educational QA Systems: Insights from the XAI Challenge at IJCNN 2025</h3>
-                            <p class="publication-authors"><strong>Long S. T. Nguyen*</strong>, <strong>Khang H. N. Vo*</strong>, Thu H. A. Nguyen, Tuan C. Bui, Duc Q. Nguyen, Thanh-Tung Tran, Anh D. Nguyen, Minh L. Nguyen, Fabien Baldacci, Thang H. Bui, Emanuel Di Nardo, Angelo Ciaramella, Son H. Le, Ihsan Ullah, Lorenzo Di Rocco and Tho T. Quan</p>
-                            <p class="publication-venue">The 4th Italian Conference on Big Data and Data Science, Turin, Italy</p>
-                            <p class="publication-description">Co-organized the XAI Challenge 2025 at IJCNN, focusing on explainable educational QA with hybrid LLM–symbolic models. Contributed to dataset construction using logic-based templates with Z3 validation, challenge design, and post-hoc analysis of participant solutions.</p>
-                        </div>
+                <div class="publication-item">
+                    <div class="publication-year">2026</div>
+                    <div class="publication-content">
+                        <h3>Catching the First Light of Tomorrow: A Hackathon-Based Framework for Introducing High School Students to AI Agents</h3>
+                        <p class="publication-authors">AAAI Press · Feb 1, 2026</p>
+                        <p class="publication-venue">AAAI Press</p>
+                        <p class="publication-description">Introduces a structured hackathon-based framework to teach high school students AI agent design through lectures, guided projects, and starter code. The approach bridges AI literacy and practical agent deployment while fostering collaboration, creativity, and responsible innovation.</p>
                     </div>
+                </div>
 
-                    <div class="publication-item">
-                        <div class="publication-year">2025</div>
-                        <div class="publication-content">
-                            <h3>VIEACT-TTS-VC: A Vietnamese End-to-End Text-to-Speech and Voice Conversion Framework Using Low-Resource Adaptable Style Transfer</h3>
-                            <p class="publication-authors">Hung D. Vo, Long S. T. Nguyen, Tri H. Trinh, <strong>Khang H. N. Vo</strong>, Tho T. Quan</p>
-                            <p class="publication-venue">11th Intelligent Systems Conference 2025, Amsterdam, The Netherlands</p>
-                            <p class="publication-description">Presented a TTS and VC framework that utilizes low-resource adaptable style transfer, enhancing speaker adaptation and synthesis quality with minimal data for both text-to-speech and voice conversion tasks.</p>
-                        </div>
+                <div class="publication-item">
+                    <div class="publication-year">2026</div>
+                    <div class="publication-content">
+                        <h3>Enhancing Water Conservation through Voice-Activated Smart Irrigation: A User-Centric Approach for Sustainable Agriculture in Vietnam</h3>
+                        <p class="publication-authors">Springer · Jan 1, 2026</p>
+                        <p class="publication-venue">Springer</p>
+                        <p class="publication-description">Presents an LLM-powered voice and text irrigation assistant for Vietnamese agriculture. The system reached 82% slang understanding, 90% intent-to-command translation accuracy, and low-latency operation across function calls, database queries, and sensor reads.</p>
                     </div>
+                </div>
 
-                    <div class="publication-item">
-                        <div class="publication-year">2025</div>
-                        <div class="publication-content">
-                            <h3>Enhancing Water Conservation through Voice-Activated Smart Irrigation: A User-Centric Approach for Sustainable Agriculture in Vietnam</h3>
-                            <p class="publication-authors"><strong>Manh-Khang Nguyen*</strong>, <strong>Hoang-Nhat-Khang Vo*</strong>, <strong>Ngoc-Sang Vo*</strong>, Ngoc-Thanh-Xuan Nguyen, Gia-Phat Le, Phan-Nhat-Minh Nguyen, and Hoang-Anh Pham</p>
-                            <p class="publication-venue">International Conference on Computational Intelligence in Engineering Science, Ho Chi Minh City, Vietnam</p>
-                            <p class="publication-description">Developed a voice- and text-based smart irrigation management system powered by a large language model (LLM), achieving 90% intent translation accuracy and 82% dialectal understanding—outperforming commercial tools—to enhance usability and sustainability in Vietnamese agriculture.</p>
-                        </div>
+                <div class="publication-item">
+                    <div class="publication-year">2025</div>
+                    <div class="publication-content">
+                        <h3>Revolutionizing Precise Low Back Pain Diagnosis via Contrastive Learning</h3>
+                        <p class="publication-authors">Springer · Dec 31, 2025</p>
+                        <p class="publication-venue">Springer</p>
+                        <p class="publication-description">Proposes LumbarCLIP, a multimodal contrastive framework aligning lumbar MRI scans with radiology reports. The model achieves up to 95.00% accuracy and 94.75% F1-score, with ablations showing linear projection heads improve cross-modal alignment.</p>
                     </div>
+                </div>
 
-                    <div class="publication-item">
-                        <div class="publication-year">2024</div>
-                        <div class="publication-content">
-                            <h3>Revitalizing Bahnar language through neural machine translation: Challenges, strategies, and promising outcomes</h3>
-                            <p class="publication-authors"><strong>Hoang Nhat Khang Vo</strong>, Duc Dong Le, Tran Minh Dat Phan, Tan Sang Nguyen, Quoc Nguyen Pham, Ngoc Oanh Tran, Quang Duc Nguyen, Tran Minh Hieu Vo, Tho Quan</p>
-                            <p class="publication-venue">EAAI-24: The 14th Symposium on Educational Advances in Artificial Intelligence, Vancouver, Canada</p>
-                            <p class="publication-description">Contributed to the preservation and dissemination of the Bahnar language, an ancient and culturally significant language of the minority ethnic group in Vietnam. Proposed innovative solutions to overcome practical hurdles in translating Vietnamese to Bahnar language, leveraging recent advances in Neural Machine Translation (NMT) and transfer learning techniques.</p>
-                        </div>
+                <div class="publication-item">
+                    <div class="publication-year">2025</div>
+                    <div class="publication-content">
+                        <h3>A Framework for LLM-Powered Database Construction: Design, Implementation, and Case Studies</h3>
+                        <p class="publication-authors">Springer · Dec 31, 2025</p>
+                        <p class="publication-venue">Springer</p>
+                        <p class="publication-description">Introduces a unified pipeline that converts unstructured data into queryable databases using prompt optimization, LLM extraction, and cloud integration. Across multiple domains, the framework achieved a mean F1-score of 93.6% with GPT-4o mini.</p>
                     </div>
+                </div>
 
-                    <div class="publication-item">
-                        <div class="publication-year">2025</div>
-                        <div class="publication-content">
-                            <h3>When Large Language Models Meet Customer Feedback: A Case Study in Understanding and Analysis</h3>
-                            <p class="publication-authors">Ngoc-Thanh-Xuan Nguyen, Gia-Phat Le, Ngoc-Sang Vo, <strong>Hoang-Nhat-Khang Vo</strong>, Song-Thien-Long Nguyen, and Hoang-Anh Pham</p>
-                            <p class="publication-venue">9th International Conference on Inventive Communication and Computational Technologies, Perambalur, India</p>
-                            <p class="publication-description">Developed an AI-driven customer feedback analysis framework integrating four modules - Data Ingestion, Storage, Analysis, and Decision Making - optimized for small businesses. Validated using real-world Vietnamese datasets, the Claude 3.5 Sonnet model achieved 87.35% sentiment classification accuracy and 82.21% accuracy in department-involved identification.</p>
-                        </div>
+                <div class="publication-item">
+                    <div class="publication-year">2025</div>
+                    <div class="publication-content">
+                        <h3>VIEACT-TTS-VC: A Vietnamese End-to-End Text-to-Speech and Voice Conversion Framework Using Low-Resource Adaptable Style Transfer</h3>
+                        <p class="publication-authors">Springer · Oct 30, 2025</p>
+                        <p class="publication-venue">Springer</p>
+                        <p class="publication-description">Presents a VITS-based Vietnamese TTS and voice conversion system for low-resource speaker adaptation. It delivers strong subjective quality, including MOS 4.31 ± 0.158 for comprehensibility and 3.68 ± 0.135 for naturalness using only 5 minutes of extra training data.</p>
                     </div>
+                </div>
 
-                    <div class="publication-item">
-                        <div class="publication-year">2024</div>
-                        <div class="publication-content">
-                            <h3>TI-JEPA: An Innovative Energy-based Joint Embedding Strategy for Text-Image Multimodal Systems</h3>
-                            <p class="publication-authors"><strong>Khang Vo*</strong>, <strong>Duc Nguyen*</strong>, Thong Nguyen and Tho Quan</p>
-                            <p class="publication-venue">The 13th International Symposium on Information and Communication Technology, Da Nang, Vietnam</p>
-                            <p class="publication-description">Introduced a novel approach using Joint-Embedding Predictive Architecture for text-image alignment, improving multimodal fusion. Conducted experiment on sentiment analysis task with text and image.</p>
-                        </div>
+                <div class="publication-item">
+                    <div class="publication-year">2025</div>
+                    <div class="publication-content">
+                        <h3>When Large Language Models Meet Customer Feedback: A Case Study in Understanding and Analysis</h3>
+                        <p class="publication-authors">9th International Conference on Inventive Communication and Computational Technologies</p>
+                        <p class="publication-venue">ICICCT</p>
+                        <p class="publication-description">Develops a four-module framework for customer feedback analytics and validates it on Vietnamese real-world business data. Claude 3.5 Sonnet achieved 87.35% sentiment classification accuracy and 82.21% department identification accuracy.</p>
                     </div>
+                </div>
+
+                <div class="publication-item">
+                    <div class="publication-year">2024</div>
+                    <div class="publication-content">
+                        <h3>TI-JEPA: An Innovative Energy-based Joint Embedding Strategy for Text-Image Multimodal Systems</h3>
+                        <p class="publication-authors">Symposium on Information and Communication Technology · Oct 27, 2024</p>
+                        <p class="publication-venue">SOICT</p>
+                        <p class="publication-description">Introduces TI-JEPA, an energy-based joint embedding pretraining strategy for text-image alignment using cross-attention. The method delivered competitive accuracy and F1 on multimodal sentiment analysis benchmarks. GitHub: <a href="https://github.com/nhatkhangcs/tijepa" target="_blank" rel="noopener">nhatkhangcs/tijepa</a>.</p>
+                    </div>
+                </div>
+
+                <div class="publication-item">
+                    <div class="publication-year">2024</div>
+                    <div class="publication-content">
+                        <h3>Revitalizing Bahnaric Language through Neural Machine Translation: Challenges, Strategies, and Promising Outcomes</h3>
+                        <p class="publication-authors">AAAI Press · Mar 24, 2024</p>
+                        <p class="publication-venue">AAAI Press</p>
+                        <p class="publication-description">Addresses Vietnamese-to-Bahnar translation in an extreme low-resource setting using transfer learning and targeted augmentation. The approach improves translation quality over baselines and supports preservation and accessibility of the Bahnaric language. GitHub: <a href="https://github.com/nhatkhangcs/BARTViBa" target="_blank" rel="noopener">nhatkhangcs/BARTViBa</a>.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -617,10 +658,6 @@
         <div class="container">
             <div class="footer-content">
                 <p>&copy; 2025 Vo Hoang Nhat Khang (Chris). All rights reserved.</p>
-                <div class="visitor-counter">
-                    <i class="fas fa-eye"></i>
-                    <span>Total Visitors: <span id="visitor-count">Loading...</span></span>
-                </div>
             </div>
         </div>
     </footer>

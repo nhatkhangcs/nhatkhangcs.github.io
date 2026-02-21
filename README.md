@@ -1,3 +1,3 @@
-# My Blog
+# Personal Website
 
-This is my personal blog. I write about my research, my thoughts, and my experiences.
+This is my personal website.

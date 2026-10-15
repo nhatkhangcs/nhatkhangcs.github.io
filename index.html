@@ -10,15 +10,13 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" href="favicon.svg">
-    <link rel="stylesheet" href="assets/css/styles.css?v=20260907a">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Sora:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
+    <script>document.documentElement.classList.add('js');</script>
+    <link rel="stylesheet" href="assets/css/styles.css?v=20261015d">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Scroll Progress Bar -->
-    <div class="scroll-progress">
-        <div class="scroll-progress-bar"></div>
-    </div>
+    <canvas class="bg-graph" aria-hidden="true"></canvas>
 
     <!-- Navigation -->
     <nav class="navbar">
@@ -28,7 +26,7 @@
             </div>
             <ul class="nav-menu">
                 <li><a href="#home">Home</a></li>
-                <li><a href="#latest">Latest</a></li>
+                <li><a href="#latest">News</a></li>
                 <li><a href="#journey">Journey</a></li>
                 <li><a href="#publications">Publications</a></li>
                 <li><a href="#projects">Projects</a></li>
@@ -39,28 +37,23 @@
                 <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
                     <i class="fas fa-moon"></i>
                 </button>
-                <div class="hamburger">
+                <button class="hamburger" aria-label="Open menu" aria-expanded="false">
                     <span></span>
                     <span></span>
                     <span></span>
-                </div>
+                </button>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section id="home" class="hero">
-        <div class="animated-bg"></div>
-        <div class="floating-particles"></div>
         <div class="hero-container">
             <div class="hero-image">
-                <div class="avatar-container">
-                    <img src="assets/img/images/avatar.jpg" alt="Vo Hoang Nhat Khang (Chris) - PhD Student in NLP" class="hero-avatar">
-                    <div class="avatar-glow"></div>
-                </div>
+                <img src="assets/img/images/avatar.jpg" alt="Vo Hoang Nhat Khang (Chris)" class="hero-avatar">
             </div>
-            <div class="hero-content hero-content-panel">
-                <h1 class="hero-title" data-text="Vo Hoang Nhat Khang (Chris)">Vo Hoang Nhat Khang <span class="hero-nickname">(Chris)</span></h1>
+            <div class="hero-content">
+                <h1 class="hero-title">Vo Hoang Nhat Khang <span class="hero-nickname">(Chris)</span></h1>
                 <p class="hero-subtitle">PhD Student in Natural Language Processing</p>
 
                 <div class="hero-roles" aria-label="Current academic roles">
@@ -76,6 +69,13 @@
 
                 <p class="hero-background"><strong>Background.</strong> I completed my Computer Science degree at HCMUT-VNU in an accelerated 3.5 years. Under the guidance of <a href="https://ieeexplore.ieee.org/author/37540326900" target="_blank" rel="noopener">Assoc. Prof. Dr. Tho T. Quan</a>, I built foundations in machine learning, deep learning, and multimodal analysis, with programming experience in Python, C++, and Java.</p>
                 <p class="hero-interests"><strong>Research interests.</strong> Vision-language models, uncertainty quantification, hallucination detection, and multimodal learning.</p>
+                <p class="hero-callout"><strong>Open to internships.</strong> I am looking for 3–6 month industry research internships, preferably in Europe, or in the US. If you think I would be a good fit, please reach out on <a href="https://linkedin.com/in/khangchris/" target="_blank" rel="noopener">LinkedIn</a>.</p>
+                <ul class="hero-links" aria-label="Profiles">
+                    <li><a href="#contact"><i class="fas fa-envelope" aria-hidden="true"></i>Email</a></li>
+                    <li><a href="https://scholar.google.com/citations?user=BDpLfNUAAAAJ&amp;hl=en" target="_blank" rel="noopener"><i class="fas fa-graduation-cap" aria-hidden="true"></i>Google Scholar</a></li>
+                    <li><a href="https://github.com/nhatkhangcs" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i>GitHub</a></li>
+                    <li><a href="https://linkedin.com/in/khangchris/" target="_blank" rel="noopener"><i class="fab fa-linkedin" aria-hidden="true"></i>LinkedIn</a></li>
+                </ul>
             </div>
         </div>
     </section>
@@ -84,7 +84,7 @@
     <section id="latest" class="latest">
         <div class="container">
             <h2 class="section-title">News</h2>
-            <p class="friendly-note section-friendly-note">A running log of research updates and recent milestones.</p>
+            <p class="section-note">Recent research updates and milestones.</p>
             <div class="latest-list">
                 <div class="latest-entry">
                     <div class="latest-media latest-photos">
@@ -180,8 +180,8 @@
     <!-- Publications Section -->
     <section id="publications" class="publications">
         <div class="container">
-            <h2 class="section-title">Selected Research Publications</h2>
-            <p class="friendly-note section-friendly-note">A few papers that escaped my laptop and made it into the world.</p>
+            <h2 class="section-title">Selected Publications</h2>
+            <p class="section-note"><sup>*</sup> denotes equal contribution. A complete list is available on <a href="https://scholar.google.com/citations?user=BDpLfNUAAAAJ&amp;hl=en" target="_blank" rel="noopener">Google Scholar</a>.</p>
             <div class="publication-list">
                 <article class="publication-entry">
                     <a class="publication-figure" href="assets/img/images/publication-merit.png" target="_blank" rel="noopener" aria-label="View the MERIT causal online repair process at full size">
@@ -206,7 +206,6 @@
                         <span class="publication-year">2026</span>
                         <h3 class="publication-title">The JEPA Paradox in Language: The Geometry of Linguistic Alternatives</h3>
                         <p class="publication-authors">Anh Trac Duc Dinh<sup>*</sup>, <strong>Khang Nhat Hoang Vo</strong><sup>*</sup></p>
-                        <p class="publication-contribution-note">* Equal contribution.</p>
                         <p class="publication-meta">arXiv · 2026</p>
                         <div class="publication-links">
                             <a class="publication-link-button" href="https://arxiv.org/abs/2607.23531" target="_blank" rel="noopener">Paper <span aria-hidden="true">↗</span></a>
@@ -226,7 +225,6 @@
                         <span class="publication-year">2026</span>
                         <h3 class="publication-title">Echoes Across Vietnam's Highlands, Delta, and Coast: A Multilingual Corpus for Cham, Khmer, and Tay-Nung</h3>
                         <p class="publication-authors">Anh Trac Duc Dinh<sup>*</sup>, <strong>Khang Nhat Hoang Vo</strong><sup>*</sup>, Vinh Cong Doan, Tai Tien Ta, Khoa Duc Anh Lam</p>
-                        <p class="publication-contribution-note">* Equal contribution.</p>
                         <p class="publication-meta">arXiv · 2026</p>
                         <div class="publication-links">
                             <a class="publication-link-button" href="https://arxiv.org/abs/2607.08362" target="_blank" rel="noopener">Paper <span aria-hidden="true">↗</span></a>
@@ -291,7 +289,6 @@
                         <span class="publication-year">2025</span>
                         <h3 class="publication-title">Revolutionizing Precise Low Back Pain Diagnosis via Contrastive Learning</h3>
                         <p class="publication-authors">Thanh Binh Le<sup>*</sup>, <strong>Hoang Nhat Khang Vo</strong><sup>*</sup>, Tan-Ha Mai, Trong Nhan Phan</p>
-                        <p class="publication-contribution-note">* Equal contribution.</p>
                         <p class="publication-meta">Springer · Dec 31, 2025</p>
                         <div class="publication-links">
                             <a class="publication-link-button" href="https://arxiv.org/abs/2509.20813" target="_blank" rel="noopener">Paper <span aria-hidden="true">↗</span></a>
@@ -306,7 +303,6 @@
                         <span class="publication-year">2024</span>
                         <h3 class="publication-title">TI-JEPA: An Innovative Energy-based Joint Embedding Strategy for Text-Image Multimodal Systems</h3>
                         <p class="publication-authors"><strong>Khang H. N. Vo</strong><sup>*</sup>, Duc P. T. Nguyen<sup>*</sup>, Thong Nguyen, Tho T. Quan</p>
-                        <p class="publication-contribution-note">* Equal contribution.</p>
                         <p class="publication-meta">SOICT</p>
                         <div class="publication-links">
                             <a class="publication-link-button" href="https://arxiv.org/abs/2503.06380" target="_blank" rel="noopener">Paper <span aria-hidden="true">↗</span></a>
@@ -336,31 +332,88 @@
     <section id="projects" class="projects">
         <div class="container">
             <h2 class="section-title">Featured Projects</h2>
-            <p class="friendly-note section-friendly-note">Things I built after saying, "This should be a quick experiment".</p>
-            <div class="simple-list">
-                <p class="simple-line"><span class="simple-date">2025</span> - <strong>VitalFit Persona</strong>: AI-powered healthcare application with agentic AI capabilities. <a href="https://github.com/nhatkhangcs/vitalfit-persona" target="_blank" rel="noopener">GitHub</a></p>
-                <p class="simple-line"><span class="simple-date">2025</span> - <strong>V7</strong>: advanced AI system showcasing machine learning and AI implementations. <a href="https://github.com/nhatkhangcs/v7" target="_blank" rel="noopener">GitHub</a></p>
-                <p class="simple-line"><span class="simple-date">2025</span> - <strong>Synthetic Generator</strong>: data generation system for synthetic datasets for machine learning. <a href="https://github.com/nhatkhangcs/synthetic_generator" target="_blank" rel="noopener">GitHub</a></p>
-                <p class="simple-line"><span class="simple-date">2025</span> - <strong>Namizer</strong>: Vietnamese tokenizer that breaks words into 5 components. <a href="https://github.com/nhatkhangcs/namizer" target="_blank" rel="noopener">GitHub</a></p>
-                <p class="simple-line"><span class="simple-date">2024</span> - <strong>HCMUT Chatbot</strong>: LLM and RAG-based chatbot for university academic admission. <a href="https://github.com/nhatkhangcs/hcmut-chatbot.git" target="_blank" rel="noopener">GitHub</a></p>
-            </div>
+            <p class="section-note">Selected software and research prototypes.</p>
+            <ul class="record-list">
+                <li class="record-row">
+                    <span class="record-key">2026</span>
+                    <span class="record-body"><strong>sidecomments</strong> — LaTeX package that renders review comments in margin boxes with arrows to the commented text, figure, table, or equation, compatible with ACL/ARR, ICLR, CVPR, and AAAI templates.</span>
+                    <a class="record-link" href="https://github.com/nhatkhangcs/overleaf_comments" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+                </li>
+                <li class="record-row">
+                    <span class="record-key">2025</span>
+                    <span class="record-body"><strong>VitalFit Persona</strong> — AI-powered healthcare application with agentic AI capabilities.</span>
+                    <a class="record-link" href="https://github.com/nhatkhangcs/vitalfit-persona" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+                </li>
+                <li class="record-row">
+                    <span class="record-key">2025</span>
+                    <span class="record-body"><strong>V7</strong> — Advanced AI system showcasing machine learning and AI implementations.</span>
+                    <a class="record-link" href="https://github.com/nhatkhangcs/v7" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+                </li>
+                <li class="record-row">
+                    <span class="record-key">2025</span>
+                    <span class="record-body"><strong>Synthetic Generator</strong> — Data generation system for synthetic datasets for machine learning.</span>
+                    <a class="record-link" href="https://github.com/nhatkhangcs/synthetic_generator" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+                </li>
+                <li class="record-row">
+                    <span class="record-key">2025</span>
+                    <span class="record-body"><strong>Namizer</strong> — Vietnamese tokenizer that breaks words into 5 components.</span>
+                    <a class="record-link" href="https://github.com/nhatkhangcs/namizer" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+                </li>
+                <li class="record-row">
+                    <span class="record-key">2024</span>
+                    <span class="record-body"><strong>HCMUT Chatbot</strong> — LLM and RAG-based chatbot for university academic admission.</span>
+                    <a class="record-link" href="https://github.com/nhatkhangcs/hcmut-chatbot.git" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+                </li>
+            </ul>
         </div>
     </section>
 
     <!-- Media Coverage Section -->
     <section id="media" class="media">
         <div class="container">
-            <h2 class="section-title">Media Coverage & Recognition</h2>
-            <div class="simple-list">
-                <p class="simple-line"><strong>Thanh Nien Newspaper</strong> - Early graduation with near-perfect thesis score. <a href="https://thanhnien.vn/bi-quyet-tot-nghiep-som-voi-diem-luan-van-gan-tuyet-doi-cua-nam-sinh-bach-khoa-185250327191048008.htm" target="_blank" rel="noopener">Article</a></p>
-                <p class="simple-line"><strong>Znews.vn</strong> - Young engineer uses AI to change Vietnamese typing. <a href="https://znews.vn/ky-su-tre-dung-ai-thay-doi-cach-go-tieng-viet-post1552246.html" target="_blank" rel="noopener">Article</a></p>
-                <p class="simple-line"><strong>OISP HCMUT</strong> - Bach Khoa International student shines in AmCham Scholarship 2024. <a href="https://oisp.hcmut.edu.vn/cuoc-song-sinh-vien/sv-bach-khoa-quoc-te-toa-sang-chinh-phuc-hoc-bong-amcham-danh-gia-2024.html" target="_blank" rel="noopener">Article</a></p>
-                <p class="simple-line"><strong>OISP HCMUT International</strong> - From barely in to top talented student. <a href="https://oisp.hcmut.edu.vn/en/featured/hcmut-last-minute-miracle-from-barely-in-to-top-talented-student.html" target="_blank" rel="noopener">Article</a></p>
-                <p class="simple-line"><strong>OISP HCMUT</strong> - Rejecting New Zealand study abroad to choose Bach Khoa. <a href="https://oisp.hcmut.edu.vn/cuoc-song-sinh-vien/hoc-thuat-nghien-cuu-khoa-hoc/tu-choi-du-hoc-new-zealand-de-chon-hoc-bach-khoa.html" target="_blank" rel="noopener">Article</a></p>
-                <p class="simple-line"><strong>BK Quoc Te Facebook</strong> - Bach Khoa International Program feature. <a href="https://www.facebook.com/bkquocte/videos/694291076817253" target="_blank" rel="noopener">Video</a></p>
-                <p class="simple-line"><strong>Thanh Nien Facebook</strong> - Social media feature on academic achievements and early graduation. <a href="https://www.facebook.com/thanhnien/posts/pfbid02F6yN18sy3jfau5hc3PH6B5ryKMwdn1nfEK9CAxEwQJbZU9UdMbwHNqdnLcu3AoxRl" target="_blank" rel="noopener">Post</a></p>
-                <p class="simple-line"><strong>BK Quoc Te Facebook</strong> - Academic excellence recognition. <a href="https://www.facebook.com/bkquocte/posts/pfbid02t2pxY7YS5hysxiBxfnH1YT3h8VyM76dcbBNTHwae6WWnLoP6AqRNwxEfW4KBEo4Ml" target="_blank" rel="noopener">Post</a></p>
-            </div>
+            <h2 class="section-title">Media Coverage &amp; Recognition</h2>
+            <ul class="record-list">
+                <li class="record-row">
+                    <span class="record-key">Thanh Nien Newspaper</span>
+                    <span class="record-body">Early graduation with near-perfect thesis score.</span>
+                    <a class="record-link" href="https://thanhnien.vn/bi-quyet-tot-nghiep-som-voi-diem-luan-van-gan-tuyet-doi-cua-nam-sinh-bach-khoa-185250327191048008.htm" target="_blank" rel="noopener">Article <span aria-hidden="true">↗</span></a>
+                </li>
+                <li class="record-row">
+                    <span class="record-key">Znews.vn</span>
+                    <span class="record-body">Young engineer uses AI to change Vietnamese typing.</span>
+                    <a class="record-link" href="https://znews.vn/ky-su-tre-dung-ai-thay-doi-cach-go-tieng-viet-post1552246.html" target="_blank" rel="noopener">Article <span aria-hidden="true">↗</span></a>
+                </li>
+                <li class="record-row">
+                    <span class="record-key">OISP HCMUT</span>
+                    <span class="record-body">Bach Khoa International student shines in AmCham Scholarship 2024.</span>
+                    <a class="record-link" href="https://oisp.hcmut.edu.vn/cuoc-song-sinh-vien/sv-bach-khoa-quoc-te-toa-sang-chinh-phuc-hoc-bong-amcham-danh-gia-2024.html" target="_blank" rel="noopener">Article <span aria-hidden="true">↗</span></a>
+                </li>
+                <li class="record-row">
+                    <span class="record-key">OISP HCMUT International</span>
+                    <span class="record-body">From barely in to top talented student.</span>
+                    <a class="record-link" href="https://oisp.hcmut.edu.vn/en/featured/hcmut-last-minute-miracle-from-barely-in-to-top-talented-student.html" target="_blank" rel="noopener">Article <span aria-hidden="true">↗</span></a>
+                </li>
+                <li class="record-row">
+                    <span class="record-key">OISP HCMUT</span>
+                    <span class="record-body">Rejecting New Zealand study abroad to choose Bach Khoa.</span>
+                    <a class="record-link" href="https://oisp.hcmut.edu.vn/cuoc-song-sinh-vien/hoc-thuat-nghien-cuu-khoa-hoc/tu-choi-du-hoc-new-zealand-de-chon-hoc-bach-khoa.html" target="_blank" rel="noopener">Article <span aria-hidden="true">↗</span></a>
+                </li>
+                <li class="record-row">
+                    <span class="record-key">BK Quoc Te Facebook</span>
+                    <span class="record-body">Bach Khoa International Program feature.</span>
+                    <a class="record-link" href="https://www.facebook.com/bkquocte/videos/694291076817253" target="_blank" rel="noopener">Video <span aria-hidden="true">↗</span></a>
+                </li>
+                <li class="record-row">
+                    <span class="record-key">Thanh Nien Facebook</span>
+                    <span class="record-body">Social media feature on academic achievements and early graduation.</span>
+                    <a class="record-link" href="https://www.facebook.com/thanhnien/posts/pfbid02F6yN18sy3jfau5hc3PH6B5ryKMwdn1nfEK9CAxEwQJbZU9UdMbwHNqdnLcu3AoxRl" target="_blank" rel="noopener">Post <span aria-hidden="true">↗</span></a>
+                </li>
+                <li class="record-row">
+                    <span class="record-key">BK Quoc Te Facebook</span>
+                    <span class="record-body">Academic excellence recognition.</span>
+                    <a class="record-link" href="https://www.facebook.com/bkquocte/posts/pfbid02t2pxY7YS5hysxiBxfnH1YT3h8VyM76dcbBNTHwae6WWnLoP6AqRNwxEfW4KBEo4Ml" target="_blank" rel="noopener">Post <span aria-hidden="true">↗</span></a>
+                </li>
+            </ul>
         </div>
     </section>
 
@@ -368,13 +421,18 @@
     <!-- Contact Section -->
     <section id="contact" class="contact">
         <div class="container">
-            <h2 class="section-title">Get In Touch</h2>
-            <p class="friendly-note section-friendly-note">Want to discuss research, build something useful, or compare notes on why a model is confidently wrong? Say hello.</p>
-            <div class="simple-list">
-                <p class="simple-line"><strong>Email</strong> - nhatkhangdtp [at] gmail [dot] com · Khang.Vo [at] mbzuai [dot] ac [dot] ae <span class="email-aside">(Sorry, scrapers.)</span></p>
-                <p class="simple-line"><strong>Location</strong> - Abu Dhabi, UAE (PhD studies) · Ho Chi Minh City, Vietnam</p>
-                <p class="simple-line"><strong>Links</strong> - <a href="https://linkedin.com/in/khangchris/" target="_blank" rel="noopener">LinkedIn</a> · <a href="https://github.com/nhatkhangcs" target="_blank" rel="noopener">GitHub</a> · <a href="https://scholar.google.com/citations?user=BDpLfNUAAAAJ&amp;hl=en" target="_blank" rel="noopener">Google Scholar</a></p>
-            </div>
+            <h2 class="section-title">Contact</h2>
+            <p class="section-note">I welcome inquiries about research collaboration and related opportunities.</p>
+            <dl class="contact-list">
+                <dt>Internships</dt>
+                <dd>Seeking 3–6 month industry research internships, preferably in Europe, or in the US. Please contact me via <a href="https://linkedin.com/in/khangchris/" target="_blank" rel="noopener">LinkedIn</a>.</dd>
+                <dt>Email</dt>
+                <dd>nhatkhangdtp [at] gmail [dot] com · Khang.Vo [at] mbzuai [dot] ac [dot] ae</dd>
+                <dt>Location</dt>
+                <dd>Abu Dhabi, UAE · Ho Chi Minh City, Vietnam</dd>
+                <dt>Profiles</dt>
+                <dd><a href="https://scholar.google.com/citations?user=BDpLfNUAAAAJ&amp;hl=en" target="_blank" rel="noopener">Google Scholar</a> · <a href="https://github.com/nhatkhangcs" target="_blank" rel="noopener">GitHub</a> · <a href="https://linkedin.com/in/khangchris/" target="_blank" rel="noopener">LinkedIn</a></dd>
+            </dl>
         </div>
     </section>
 
@@ -383,7 +441,7 @@
         <div class="container">
             <div class="footer-content">
                 <p>&copy; 2026 Vo Hoang Nhat Khang (Chris). All rights reserved.</p>
-                <p class="footer-friendly-note">Built with curiosity, patience, and a suspicious number of browser refreshes.</p>
+                <p>Last updated October 2026</p>
             </div>
         </div>
     </footer>

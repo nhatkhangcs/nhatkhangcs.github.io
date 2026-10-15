@@ -1,258 +1,61 @@
-// Mobile Navigation Toggle
-const hamburger = document.querySelector('.hamburger');
-const navMenu = document.querySelector('.nav-menu');
+// Mobile navigation
+function initMobileNav() {
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+    if (!hamburger || !navMenu) return;
 
-if (hamburger && navMenu) {
+    const setOpen = (open) => {
+        hamburger.classList.toggle('active', open);
+        navMenu.classList.toggle('active', open);
+        hamburger.setAttribute('aria-expanded', String(open));
+        hamburger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    };
+
     hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        navMenu.classList.toggle('active');
+        setOpen(!navMenu.classList.contains('active'));
+    });
+
+    navMenu.querySelectorAll('a[href^="#"]').forEach(link => {
+        link.addEventListener('click', () => setOpen(false));
     });
 }
 
-// Close mobile menu when clicking on internal anchor links only
-document.querySelectorAll('.nav-menu a').forEach(link => {
-    link.addEventListener('click', () => {
-        const href = link.getAttribute('href');
-        // Only close menu for internal anchor links (starting with #)
-        if (href && href.startsWith('#') && hamburger && navMenu) {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
-        }
-        // For external page links, let the page navigate normally
-        // without closing the menu immediately
-    });
-});
-
-
-
-// Smooth scrolling for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});
-
-function updateNavbarState() {
-    const navbar = document.querySelector('.navbar');
-    if (!navbar) return;
-    const isDark = document.body.classList.contains('dark-mode');
-    navbar.classList.toggle('navbar-scrolled', window.scrollY > 100);
-
-    if (window.scrollY > 100) {
-        navbar.style.background = isDark ? 'rgba(5, 11, 22, 0.97)' : 'rgba(255, 255, 255, 0.98)';
-        navbar.style.boxShadow = isDark
-            ? '0 2px 20px rgba(0, 0, 0, 0.6)'
-            : '0 2px 20px rgba(0, 0, 0, 0.15)';
-    } else {
-        navbar.style.background = isDark ? 'rgba(0, 0, 0, 0.92)' : 'rgba(255, 255, 255, 0.95)';
-        navbar.style.boxShadow = isDark
-            ? '0 2px 20px rgba(0, 0, 0, 0.5)'
-            : '0 2px 20px rgba(0, 0, 0, 0.1)';
-    }
-}
-
-// Navbar background change on scroll
-window.addEventListener('scroll', updateNavbarState);
-
-// Add loading animation to the page
-window.addEventListener('load', () => {
-    document.body.classList.add('loaded');
-});
-
-// Add scroll-to-top functionality
-const scrollToTopBtn = document.createElement('button');
-scrollToTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
-scrollToTopBtn.className = 'scroll-to-top';
-scrollToTopBtn.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    cursor: pointer;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    transition: all 0.3s ease;
-    z-index: 1000;
-`;
-
-document.body.appendChild(scrollToTopBtn);
-
-// Show/hide scroll-to-top button
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-        scrollToTopBtn.style.display = 'flex';
-    } else {
-        scrollToTopBtn.style.display = 'none';
-    }
-});
-
-// Scroll to top functionality
-scrollToTopBtn.addEventListener('click', () => {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
-});
-
-// Add hover effect to scroll-to-top button
-scrollToTopBtn.addEventListener('mouseenter', () => {
-    scrollToTopBtn.style.transform = 'scale(1.1)';
-    scrollToTopBtn.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
-});
-
-scrollToTopBtn.addEventListener('mouseleave', () => {
-    scrollToTopBtn.style.transform = 'scale(1)';
-    scrollToTopBtn.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
-});
-
-// Add CSS for scroll-to-top button
-const style = document.createElement('style');
-style.textContent = `
-    .scroll-to-top:hover {
-        transform: scale(1.1) !important;
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6) !important;
-    }
-`;
-document.head.appendChild(style);
-
-// Cool Features Implementation
-
-// 1. Scroll Progress Bar
-function initScrollProgress() {
-    const progressBar = document.querySelector('.scroll-progress-bar');
-    if (!progressBar) return; // Exit if progress bar doesn't exist
-    
-    window.addEventListener('scroll', () => {
-        const scrollTop = window.pageYOffset;
-        const docHeight = document.body.scrollHeight - window.innerHeight;
-        const scrollPercent = (scrollTop / docHeight) * 100;
-        progressBar.style.width = scrollPercent + '%';
-    });
-}
-
-// 2. Dark Mode Toggle
+// Theme: saved preference, otherwise the system setting
 function initDarkMode() {
     const themeToggle = document.getElementById('theme-toggle');
-    const body = document.body;
     if (!themeToggle) return;
-    
-    // Check for saved theme preference or default to light mode
-    const currentTheme = localStorage.getItem('theme') || 'light';
-    body.classList.toggle('dark-mode', currentTheme === 'dark');
-    updateThemeIcon(currentTheme);
-    
+
+    let saved = null;
+    try {
+        saved = localStorage.getItem('theme');
+    } catch (e) {}
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(saved || (prefersDark ? 'dark' : 'light'));
+
     themeToggle.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
-        const isDark = body.classList.contains('dark-mode');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        updateThemeIcon(isDark ? 'dark' : 'light');
-        updateNavbarState();
+        const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+        applyTheme(next);
+        try {
+            localStorage.setItem('theme', next);
+        } catch (e) {}
     });
 }
 
-function updateThemeIcon(theme) {
-    const themeToggle = document.getElementById('theme-toggle');
-    const icon = themeToggle.querySelector('i');
-    icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+function applyTheme(theme) {
+    const isDark = theme === 'dark';
+    document.body.classList.toggle('dark-mode', isDark);
+    const icon = document.querySelector('#theme-toggle i');
+    if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    document.dispatchEvent(new Event('themechange'));
 }
 
-// 3. Floating Particles Animation
-function initFloatingParticles() {
-    const particlesContainer = document.querySelector('.floating-particles');
-    if (!particlesContainer) return; // Exit if the container doesn't exist on the page
-    
-    const particleCount = 9;
-    
-    for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.animationDelay = Math.random() * 6 + 's';
-        particle.style.left = Math.random() * 100 + '%';
-        particlesContainer.appendChild(particle);
-    }
+// Navbar border once the page scrolls
+function updateNavbarState() {
+    const navbar = document.querySelector('.navbar');
+    if (navbar) navbar.classList.toggle('navbar-scrolled', window.scrollY > 8);
 }
 
-// 5. Map Integration (using embedded iframe - no JavaScript needed)
-
-// 6. Enhanced Hover Effects
-function initEnhancedHoverEffects() {
-    // Add ripple effect to buttons
-    document.querySelectorAll('.btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            const ripple = document.createElement('span');
-            const rect = this.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-            
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            ripple.classList.add('ripple');
-            
-            this.appendChild(ripple);
-            
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-        });
-    });
-    
-    // Add CSS for ripple effect
-    const style = document.createElement('style');
-    style.textContent = `
-        .btn {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .ripple {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.6);
-            transform: scale(0);
-            animation: ripple 0.6s linear;
-            pointer-events: none;
-        }
-        
-        @keyframes ripple {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-    `;
-    document.head.appendChild(style);
-}
-
-// 7. Parallax Scrolling Effect
-function initParallaxEffect() {
-    window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset;
-        const parallaxElements = document.querySelectorAll('.animated-bg, .floating-particles');
-        
-        parallaxElements.forEach(element => {
-            const speed = 0.5;
-            element.style.transform = `translateY(${scrolled * speed}px)`;
-        });
-    });
-}
-
+// Highlight the nav link for the section in view
 function initActiveNavLinks() {
     const navLinks = Array.from(document.querySelectorAll('.nav-menu a[href^="#"]'));
     const sections = navLinks
@@ -266,8 +69,9 @@ function initActiveNavLinks() {
             link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
         });
     };
+
     const updateActiveLinkOnScroll = () => {
-        const navbarHeight = document.querySelector('.navbar')?.offsetHeight || 80;
+        const navbarHeight = document.querySelector('.navbar')?.offsetHeight || 64;
         const markerY = window.scrollY + navbarHeight + 24;
         const atPageBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 2);
 
@@ -292,15 +96,214 @@ function initActiveNavLinks() {
     updateActiveLinkOnScroll();
 }
 
-// Initialize all cool features
+// Back-to-top button
+function initScrollToTop() {
+    const button = document.createElement('button');
+    button.className = 'scroll-to-top';
+    button.setAttribute('aria-label', 'Back to top');
+    button.innerHTML = '<i class="fas fa-arrow-up" aria-hidden="true"></i>';
+    button.hidden = true;
+    document.body.appendChild(button);
+
+    button.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    window.addEventListener('scroll', () => {
+        button.hidden = window.scrollY < 600;
+    }, { passive: true });
+}
+
+// Fade sections in as they scroll into view
+function initScrollReveal() {
+    const targets = document.querySelectorAll(
+        '.section-title, .section-note, .latest-entry, .publication-entry, .record-row, .contact-list'
+    );
+    if (!targets.length) return;
+
+    // Stagger rows within the same list
+    document.querySelectorAll('.record-list').forEach(list => {
+        Array.from(list.children).forEach((row, i) => {
+            row.style.setProperty('--reveal-index', Math.min(i, 8));
+        });
+    });
+
+    if (!('IntersectionObserver' in window)) {
+        targets.forEach(el => el.classList.add('is-visible'));
+        return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+
+    targets.forEach(el => observer.observe(el));
+}
+
+// Page background: drifting points linked to neighbours and to the cursor
+function initBackgroundGraph() {
+    const canvas = document.querySelector('.bg-graph');
+    if (!canvas || !canvas.getContext) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const ctx = canvas.getContext('2d');
+    const LINK_DIST = 130;
+    const CURSOR_DIST = 170;
+    const pointer = { x: 0, y: 0, active: false };
+    let points = [];
+    let width = 0;
+    let height = 0;
+    let rgb = '31, 58, 104';
+    let running = false;
+    let frame = 0;
+    let lastWidth = 0;
+
+    const readColor = () => {
+        const probe = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+        const hex = probe.replace('#', '');
+        if (hex.length === 6) {
+            rgb = [0, 2, 4].map(i => parseInt(hex.slice(i, i + 2), 16)).join(', ');
+        }
+    };
+
+    const resize = () => {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        // Mobile toolbars change the height while scrolling; keep the points then
+        if (points.length && width === lastWidth) return;
+        lastWidth = width;
+
+        const count = Math.round(Math.min(80, Math.max(24, (width * height) / 14000)));
+        points = Array.from({ length: count }, () => ({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.3,
+            vy: (Math.random() - 0.5) * 0.3,
+            r: 1.2 + Math.random() * 1.2
+        }));
+    };
+
+    const step = () => {
+        if (!running) return;
+        ctx.clearRect(0, 0, width, height);
+
+        for (const p of points) {
+            // Gentle pull toward the cursor
+            if (pointer.active) {
+                const dx = pointer.x - p.x;
+                const dy = pointer.y - p.y;
+                const d = Math.hypot(dx, dy);
+                if (d < CURSOR_DIST && d > 1) {
+                    p.vx += (dx / d) * 0.012;
+                    p.vy += (dy / d) * 0.012;
+                }
+            }
+
+            // Keep speed bounded so the field stays calm
+            const speed = Math.hypot(p.vx, p.vy);
+            if (speed > 0.6) {
+                p.vx *= 0.6 / speed;
+                p.vy *= 0.6 / speed;
+            }
+
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > width) p.vx *= -1;
+            if (p.y < 0 || p.y > height) p.vy *= -1;
+            p.x = Math.max(0, Math.min(width, p.x));
+            p.y = Math.max(0, Math.min(height, p.y));
+        }
+
+        ctx.lineWidth = 1;
+        for (let i = 0; i < points.length; i++) {
+            const a = points[i];
+            for (let j = i + 1; j < points.length; j++) {
+                const b = points[j];
+                const d = Math.hypot(a.x - b.x, a.y - b.y);
+                if (d < LINK_DIST) {
+                    ctx.strokeStyle = `rgba(${rgb}, ${0.13 * (1 - d / LINK_DIST)})`;
+                    ctx.beginPath();
+                    ctx.moveTo(a.x, a.y);
+                    ctx.lineTo(b.x, b.y);
+                    ctx.stroke();
+                }
+            }
+
+            if (pointer.active) {
+                const d = Math.hypot(a.x - pointer.x, a.y - pointer.y);
+                if (d < CURSOR_DIST) {
+                    ctx.strokeStyle = `rgba(${rgb}, ${0.28 * (1 - d / CURSOR_DIST)})`;
+                    ctx.beginPath();
+                    ctx.moveTo(a.x, a.y);
+                    ctx.lineTo(pointer.x, pointer.y);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        ctx.fillStyle = `rgba(${rgb}, 0.32)`;
+        for (const p of points) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        frame = requestAnimationFrame(step);
+    };
+
+    const start = () => {
+        if (running) return;
+        running = true;
+        frame = requestAnimationFrame(step);
+    };
+
+    const stop = () => {
+        running = false;
+        cancelAnimationFrame(frame);
+    };
+
+    window.addEventListener('pointermove', (e) => {
+        pointer.x = e.clientX;
+        pointer.y = e.clientY;
+        pointer.active = e.pointerType === 'mouse';
+    }, { passive: true });
+    document.documentElement.addEventListener('pointerleave', () => {
+        pointer.active = false;
+    });
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(resize, 150);
+    });
+    document.addEventListener('themechange', readColor);
+
+    // Pause while the tab is in the background
+    document.addEventListener('visibilitychange', () => {
+        document.hidden ? stop() : start();
+    });
+
+    readColor();
+    resize();
+    start();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    initScrollProgress();
+    initScrollReveal();
+    initMobileNav();
     initDarkMode();
     updateNavbarState();
-    initFloatingParticles();
-    initEnhancedHoverEffects();
-    initParallaxEffect();
     initActiveNavLinks();
+    initScrollToTop();
+    initBackgroundGraph();
+    window.addEventListener('scroll', updateNavbarState, { passive: true });
 });
-
-// Map is now handled by embedded iframe - no JavaScript needed

@@ -695,6 +695,38 @@ section {
     text-decoration: underline;
 }
 
+.record-actions {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    white-space: nowrap;
+}
+
+.star-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.05rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+    text-decoration: none;
+    border: 1px solid var(--rule-strong);
+    border-radius: 999px;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.star-count i {
+    font-size: 0.72rem;
+    color: #d4a72c;
+}
+
+.star-count:hover {
+    color: var(--ink);
+    border-color: var(--ink-3);
+}
+
 /* ==========================================================================
    Contact & Footer
    ========================================================================== */

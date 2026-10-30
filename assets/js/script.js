@@ -297,7 +297,24 @@ function initBackgroundGraph() {
     start();
 }
 
+// Refresh GitHub star counts; the numbers in the HTML stay if the request fails
+function initStarCounts() {
+    document.querySelectorAll('.star-count[data-repo]').forEach(badge => {
+        fetch(`https://api.github.com/repos/${badge.dataset.repo}`)
+            .then(res => (res.ok ? res.json() : null))
+            .then(data => {
+                if (!data || typeof data.stargazers_count !== 'number') return;
+                const count = data.stargazers_count;
+                badge.querySelector('.star-number').textContent =
+                    count >= 1000 ? `${(count / 1000).toFixed(1)}k` : String(count);
+                badge.setAttribute('aria-label', `${count} GitHub stars`);
+            })
+            .catch(() => {});
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    initStarCounts();
     initScrollReveal();
     initMobileNav();
     initDarkMode();

@@ -480,6 +480,41 @@ section {
     object-fit: cover;
 }
 
+.latest-photo {
+    padding: 0;
+}
+
+.latest-photo img {
+    object-fit: cover;
+}
+
+.latest-papers {
+    margin: 0.6rem 0 0;
+    padding-left: 1.1rem;
+    font-size: 0.93rem;
+    color: var(--ink-2);
+}
+
+.latest-papers li {
+    margin-top: 0.3rem;
+}
+
+.latest-papers strong {
+    font-weight: 500;
+}
+
+.latest-papers span {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--ink-3);
+    white-space: nowrap;
+}
+
+.latest-papers span::before {
+    content: "· ";
+    font-style: normal;
+}
+
 .latest-date {
     display: block;
     margin-bottom: 0.3rem;
@@ -557,6 +592,10 @@ section {
     border-radius: 4px;
     overflow: hidden;
     transition: border-color 0.15s ease;
+}
+
+.publication-entry-text .publication-copy {
+    grid-column: 2;
 }
 
 .publication-figure:hover {
@@ -968,6 +1007,10 @@ section {
     .publication-entry {
         grid-template-columns: 1fr;
         gap: 1rem;
+    }
+
+    .publication-entry-text .publication-copy {
+        grid-column: auto;
     }
 
     .latest-media,
